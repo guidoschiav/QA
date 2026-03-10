@@ -1,0 +1,241 @@
+Date,Series,Value
+2023-01-01,GDP Real,450000
+2023-02-01,GDP Real,451500
+2023-03-01,GDP Real,453200
+2023-04-01,GDP Real,455000
+2023-05-01,GDP Real,456800
+2023-06-01,GDP Real,458500
+2023-07-01,GDP Real,460000
+2023-08-01,GDP Real,461200
+2023-09-01,GDP Real,462800
+2023-10-01,GDP Real,464500
+2023-11-01,GDP Real,466000
+2023-12-01,GDP Real,467500
+2024-01-01,GDP Real,469000
+2024-02-01,GDP Real,470500
+2024-03-01,GDP Real,472200
+2024-04-01,GDP Real,474000
+2024-05-01,GDP Real,475800
+2024-06-01,GDP Real,477500
+2024-07-01,GDP Real,479000
+2024-08-01,GDP Real,480500
+2024-09-01,GDP Real,482200
+2024-10-01,GDP Real,484000
+2024-11-01,GDP Real,485500
+2024-12-01,GDP Real,487000
+2023-01-01,Industrial Production,95.2
+2023-02-01,Industrial Production,94.8
+2023-03-01,Industrial Production,96.1
+2023-04-01,Industrial Production,97.3
+2023-05-01,Industrial Production,98.0
+2023-06-01,Industrial Production,97.5
+2023-07-01,Industrial Production,98.5
+2023-08-01,Industrial Production,99.1
+2023-09-01,Industrial Production,99.8
+2023-10-01,Industrial Production,100.5
+2023-11-01,Industrial Production,101.2
+2023-12-01,Industrial Production,102.0
+2024-01-01,Industrial Production,101.5
+2024-02-01,Industrial Production,102.3
+2024-03-01,Industrial Production,103.1
+2024-04-01,Industrial Production,104.0
+2024-05-01,Industrial Production,104.8
+2024-06-01,Industrial Production,105.5
+2024-07-01,Industrial Production,106.2
+2024-08-01,Industrial Production,107.0
+2024-09-01,Industrial Production,107.8
+2024-10-01,Industrial Production,108.5
+2024-11-01,Industrial Production,109.2
+2024-12-01,Industrial Production,110.0
+2023-01-01,Consumer Price Index,112.3
+2023-02-01,Consumer Price Index,112.9
+2023-03-01,Consumer Price Index,113.5
+2023-04-01,Consumer Price Index,114.1
+2023-05-01,Consumer Price Index,114.8
+2023-06-01,Consumer Price Index,115.4
+2023-07-01,Consumer Price Index,116.0
+2023-08-01,Consumer Price Index,116.7
+2023-09-01,Consumer Price Index,117.3
+2023-10-01,Consumer Price Index,118.0
+2023-11-01,Consumer Price Index,118.6
+2023-12-01,Consumer Price Index,119.3
+2024-01-01,Consumer Price Index,120.0
+2024-02-01,Consumer Price Index,120.7
+2024-03-01,Consumer Price Index,121.4
+2024-04-01,Consumer Price Index,122.1
+2024-05-01,Consumer Price Index,122.8
+2024-06-01,Consumer Price Index,123.5
+2024-07-01,Consumer Price Index,124.2
+2024-08-01,Consumer Price Index,124.9
+2024-09-01,Consumer Price Index,125.6
+2024-10-01,Consumer Price Index,126.3
+2024-11-01,Consumer Price Index,127.0
+2024-12-01,Consumer Price Index,127.7
+2023-01-01,M1,1850
+2023-02-01,M1,1860
+2023-03-01,M1,1875
+2023-04-01,M1,1890
+2023-05-01,M1,1905
+2023-06-01,M1,1920
+2023-07-01,M1,1935
+2023-08-01,M1,1950
+2023-09-01,M1,1965
+2023-10-01,M1,1980
+2023-11-01,M1,1995
+2023-12-01,M1,2010
+2024-01-01,M1,2025
+2024-02-01,M1,2040
+2024-03-01,M1,2055
+2024-04-01,M1,2070
+2024-05-01,M1,2085
+2024-06-01,M1,2100
+2024-07-01,M1,2115
+2024-08-01,M1,2130
+2024-09-01,M1,2145
+2024-10-01,M1,2160
+2024-11-01,M1,2175
+2024-12-01,M1,2190
+2023-01-01,M2,4200
+2023-02-01,M2,4220
+2023-03-01,M2,4250
+2023-04-01,M2,4280
+2023-05-01,M2,4310
+2023-06-01,M2,4340
+2023-07-01,M2,4370
+2023-08-01,M2,4400
+2023-09-01,M2,4430
+2023-10-01,M2,4460
+2023-11-01,M2,4490
+2023-12-01,M2,4520
+2024-01-01,M2,4550
+2024-02-01,M2,4580
+2024-03-01,M2,4610
+2024-04-01,M2,4640
+2024-05-01,M2,4670
+2024-06-01,M2,4700
+2024-07-01,M2,4730
+2024-08-01,M2,4760
+2024-09-01,M2,4790
+2024-10-01,M2,4820
+2024-11-01,M2,4850
+2024-12-01,M2,4880
+2023-01-01,Unemployment,6.2
+2023-02-01,Unemployment,6.1
+2023-03-01,Unemployment,6.0
+2023-04-01,Unemployment,5.9
+2023-05-01,Unemployment,5.8
+2023-06-01,Unemployment,5.7
+2023-07-01,Unemployment,5.6
+2023-08-01,Unemployment,5.5
+2023-09-01,Unemployment,5.4
+2023-10-01,Unemployment,5.3
+2023-11-01,Unemployment,5.2
+2023-12-01,Unemployment,5.1
+2024-01-01,Unemployment,5.0
+2024-02-01,Unemployment,4.9
+2024-03-01,Unemployment,4.8
+2024-04-01,Unemployment,4.7
+2024-05-01,Unemployment,4.6
+2024-06-01,Unemployment,4.5
+2024-07-01,Unemployment,4.4
+2024-08-01,Unemployment,4.3
+2024-09-01,Unemployment,4.2
+2024-10-01,Unemployment,4.1
+2024-11-01,Unemployment,4.0
+2024-12-01,Unemployment,3.9
+2023-01-01,Exports,32000
+2023-02-01,Exports,31500
+2023-03-01,Exports,33200
+2023-04-01,Exports,34100
+2023-05-01,Exports,34800
+2023-06-01,Exports,35500
+2023-07-01,Exports,36200
+2023-08-01,Exports,36900
+2023-09-01,Exports,37600
+2023-10-01,Exports,38300
+2023-11-01,Exports,39000
+2023-12-01,Exports,39700
+2024-01-01,Exports,40400
+2024-02-01,Exports,41100
+2024-03-01,Exports,41800
+2024-04-01,Exports,42500
+2024-05-01,Exports,43200
+2024-06-01,Exports,43900
+2024-07-01,Exports,44600
+2024-08-01,Exports,45300
+2024-09-01,Exports,46000
+2024-10-01,Exports,46700
+2024-11-01,Exports,47400
+2024-12-01,Exports,48100
+2023-01-01,Imports,35000
+2023-02-01,Imports,34800
+2023-03-01,Imports,35500
+2023-04-01,Imports,36200
+2023-05-01,Imports,36800
+2023-06-01,Imports,37500
+2023-07-01,Imports,38100
+2023-08-01,Imports,38700
+2023-09-01,Imports,39300
+2023-10-01,Imports,39900
+2023-11-01,Imports,40500
+2023-12-01,Imports,41100
+2024-01-01,Imports,41700
+2024-02-01,Imports,42300
+2024-03-01,Imports,42900
+2024-04-01,Imports,43500
+2024-05-01,Imports,44100
+2024-06-01,Imports,44700
+2024-07-01,Imports,45300
+2024-08-01,Imports,45900
+2024-09-01,Imports,46500
+2024-10-01,Imports,47100
+2024-11-01,Imports,47700
+2024-12-01,Imports,48300
+2023-01-01,Trade Balance,-3000
+2023-02-01,Trade Balance,-3300
+2023-03-01,Trade Balance,-2300
+2023-04-01,Trade Balance,-2100
+2023-05-01,Trade Balance,-2000
+2023-06-01,Trade Balance,-2000
+2023-07-01,Trade Balance,-1900
+2023-08-01,Trade Balance,-1800
+2023-09-01,Trade Balance,-1700
+2023-10-01,Trade Balance,-1600
+2023-11-01,Trade Balance,-1500
+2023-12-01,Trade Balance,-1400
+2024-01-01,Trade Balance,-1300
+2024-02-01,Trade Balance,-1200
+2024-03-01,Trade Balance,-1100
+2024-04-01,Trade Balance,-1000
+2024-05-01,Trade Balance,-900
+2024-06-01,Trade Balance,-800
+2024-07-01,Trade Balance,-700
+2024-08-01,Trade Balance,-600
+2024-09-01,Trade Balance,-500
+2024-10-01,Trade Balance,-400
+2024-11-01,Trade Balance,-300
+2024-12-01,Trade Balance,-200
+2023-01-01,Foreign Direct Investment,1200
+2023-02-01,Foreign Direct Investment,1150
+2023-03-01,Foreign Direct Investment,1300
+2023-04-01,Foreign Direct Investment,1250
+2023-05-01,Foreign Direct Investment,1400
+2023-06-01,Foreign Direct Investment,1350
+2023-07-01,Foreign Direct Investment,1500
+2023-08-01,Foreign Direct Investment,1450
+2023-09-01,Foreign Direct Investment,1600
+2023-10-01,Foreign Direct Investment,1550
+2023-11-01,Foreign Direct Investment,1700
+2023-12-01,Foreign Direct Investment,1650
+2024-01-01,Foreign Direct Investment,1800
+2024-02-01,Foreign Direct Investment,1750
+2024-03-01,Foreign Direct Investment,1900
+2024-04-01,Foreign Direct Investment,1850
+2024-05-01,Foreign Direct Investment,2000
+2024-06-01,Foreign Direct Investment,1950
+2024-07-01,Foreign Direct Investment,2100
+2024-08-01,Foreign Direct Investment,2050
+2024-09-01,Foreign Direct Investment,2200
+2024-10-01,Foreign Direct Investment,2150
+2024-11-01,Foreign Direct Investment,2300
+2024-12-01,Foreign Direct Investment,2250

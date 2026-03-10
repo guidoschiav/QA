@@ -1,0 +1,21 @@
+source_name: "Fuente Cruda"
+platform_name: "Plataforma Publicada"
+tolerance: 0.01   # 1% relative tolerance
+
+source:
+  format: long
+  date_column: Date
+  key_columns: [Region, Product]
+  value_column: Value
+  normalizations:
+    lowercase_keys: true
+    strip_keys: true
+
+platform:
+  format: long
+  date_column: report_date
+  key_columns: [region, product]
+  value_column: value
+  normalizations:
+    lowercase_keys: true
+    strip_keys: true

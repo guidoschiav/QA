@@ -1,0 +1,34 @@
+dataset_name: "demo_ventas"
+description: "Dataset de demo para Dataset Auditor"
+
+format: "long"
+date_column: "Date"
+dimension_columns: ["Region", "Product"]
+value_column: "Value"
+
+expected_frequency: "B"
+expected_start: null
+expected_end: null
+acceptable_lag_days: 2
+holidays_country: null
+timezone: null
+
+expected_dimensions:
+  Region: ["CABA", "GBA", "Interior"]
+  Product: null
+
+max_null_pct: 0.03
+allow_zero_values: false
+value_range:
+  min: 0
+  max: 200000
+
+outlier_zscore_threshold: 3.0
+pct_change_threshold: 0.5
+
+revision_whitelist:
+  enabled: false
+  max_revision_age_days: 90
+  max_revision_pct: 0.10
+
+severity_overrides: {}

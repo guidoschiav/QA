@@ -1,0 +1,44 @@
+dataset_name: "ventas_diarias"
+description: "Ventas diarias por región"
+
+# Estructura
+format: "long"  # "long" o "wide"
+date_column: "Date"
+dimension_columns: ["Region", "Product"]
+value_column: "Value"  # solo para format: long
+# value_columns: ["Sales", "Units"]  # solo para format: wide
+
+# Temporalidad
+expected_frequency: "B"  # B=business days, D=daily, W=weekly, M=monthly
+expected_start: "2024-01-01"  # null = no validar
+expected_end: null  # null = inferir como hoy - lag
+acceptable_lag_days: 2
+holidays_country: "AR"  # código ISO para feriados, null = ignorar
+timezone: "America/Buenos_Aires"
+
+# Entidades esperadas
+expected_dimensions:
+  Region: ["CABA", "GBA", "Interior"]
+  Product: null  # null = no validar valores específicos
+
+# Integridad
+max_null_pct: 0.05  # 5% máximo de nulos
+allow_zero_values: false
+value_range:
+  min: 0
+  max: 1000000
+
+# Estadística
+outlier_zscore_threshold: 3.5
+pct_change_threshold: 0.5  # 50% cambio abrupto
+
+# Consistencia
+revision_whitelist:
+  enabled: true
+  max_revision_age_days: 90  # revisiones esperadas hasta 90 días atrás
+  max_revision_pct: 0.10  # hasta 10% de celdas revisadas es normal
+
+# Severidades custom (opcional, override defaults)
+severity_overrides:
+  T1_frequency_mismatch: "BLOCKER"
+  I1_null_percentage: "WARNING"
