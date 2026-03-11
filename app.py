@@ -1,4 +1,4 @@
-﻿"""Dataset Auditor â€” Streamlit UI."""
+﻿"""Dataset Auditor — Streamlit UI."""
 from __future__ import annotations
 
 import csv
@@ -43,14 +43,14 @@ from src.series_matcher import (
     MatchingResult, SeriesMatch, UnmatchedSeries,
 )
 
-# â”€â”€ Page config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Dataset Auditor",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# â”€â”€ CSS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── CSS ───────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
 .badge-blocker  { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5;
@@ -82,7 +82,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# â”€â”€ Bootstrap: load persisted API key once per session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Bootstrap: load persisted API key once per session ────────────────────────
 if "alphacast_api_key" not in st.session_state:
     _secret_key = None
     try:
@@ -267,13 +267,13 @@ def _build_compare_html(diff) -> str:
     )
     return f"""<!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8">
-<title>Compare Report â€” {diff.source_name} vs {diff.platform_name}</title>
+<title>Compare Report — {diff.source_name} vs {diff.platform_name}</title>
 <style>body{{font-family:sans-serif;padding:24px;max-width:900px;margin:auto}}
 table{{border-collapse:collapse;width:100%}}th,td{{border:1px solid #e5e7eb;padding:6px 10px;text-align:left}}
 th{{background:#f9fafb}}.match{{font-size:2rem;font-weight:700;color:{color}}}</style>
 </head><body>
 <h1>Compare Report</h1>
-<p>{diff.source_name} vs {diff.platform_name} &nbsp;Â·&nbsp; {diff.timestamp}</p>
+<p>{diff.source_name} vs {diff.platform_name} &nbsp;·&nbsp; {diff.timestamp}</p>
 <p class="match">{pct:.1f}% match</p>
 <table><tr><th></th><th>Source</th><th>Platform</th></tr>
 <tr><td>Comparable rows</td><td colspan="2">{diff.comparable_rows:,}</td></tr>
@@ -283,14 +283,14 @@ th{{background:#f9fafb}}.match{{font-size:2rem;font-weight:700;color:{color}}}</
 </body></html>"""
 
 
-# â”€â”€ New helpers for series compare flow â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── New helpers for series compare flow ──────────────────────────────────────
 
 def _detect_column_type(df: pd.DataFrame, col: str) -> str:
     """Return a human-readable description of column type."""
     if pd.api.types.is_datetime64_any_dtype(df[col]):
-        return "ðŸ“… Fecha"
+        return "📅 Fecha"
     if pd.api.types.is_numeric_dtype(df[col]):
-        return "ðŸ“Š NumÃ©rico"
+        return "📊 Numérico"
     n_unique = df[col].nunique()
     # Quick date parse check
     sample = df[col].dropna().head(20)
@@ -298,12 +298,12 @@ def _detect_column_type(df: pd.DataFrame, col: str) -> str:
         try:
             parsed = pd.to_datetime(sample.astype(str), errors="coerce")
             if float(parsed.notna().mean()) >= 0.8:
-                return "ðŸ“… Fecha (parseable)"
+                return "📅 Fecha (parseable)"
         except Exception:
             pass
     if n_unique <= 50:
-        return f"ðŸ·ï¸ CategorÃ­a ({n_unique} Ãºnicos)"
-    return f"ðŸ“ Texto ({n_unique} Ãºnicos)"
+        return f"🏷️ Categoría ({n_unique} únicos)"
+    return f"📝 Texto ({n_unique} únicos)"
 
 
 def _auto_classify_columns(df: pd.DataFrame, src_format: str) -> dict[str, str]:
@@ -342,7 +342,7 @@ def _auto_classify_columns(df: pd.DataFrame, src_format: str) -> dict[str, str]:
         elif pd.api.types.is_numeric_dtype(df[col]):
             result[col] = "Serie" if src_format == "wide" else "Valor"
         elif df[col].nunique() <= 50:
-            result[col] = "DimensiÃ³n" if src_format == "long" else "Ignorar"
+            result[col] = "Dimensión" if src_format == "long" else "Ignorar"
         else:
             result[col] = "Ignorar"
     return result
@@ -350,10 +350,10 @@ def _auto_classify_columns(df: pd.DataFrame, src_format: str) -> dict[str, str]:
 
 def _sicon(done: bool, active: bool) -> str:
     if done:
-        return "âœ…"
+        return "✅"
     if active:
-        return "ðŸ”„"
-    return "â¬œ"
+        return "🔄"
+    return "⬜"
 
 
 def _discard_reason(s) -> str | None:
@@ -430,21 +430,21 @@ def _show_date_compose_panel(
     key_prefix: str,
 ) -> tuple[str, bool]:
     """Render the date composition UI panel. Returns (period_type, is_valid)."""
-    st.markdown(f"ðŸ“… **ComposiciÃ³n de fecha: AÃ±o + {period_kind}**")
+    st.markdown(f"📅 **Composición de fecha: Año + {period_kind}**")
     _n_nan_yr = int(df[year_col].isna().sum())
     _dc1, _dc2 = st.columns(2)
     with _dc1:
-        st.caption(f"Columna AÃ±o: **{year_col}**")
+        st.caption(f"Columna Año: **{year_col}**")
         if _n_nan_yr > 0:
-            st.info(f"â„¹ï¸ Se aplicarÃ¡ forward fill ({_n_nan_yr} celdas vacÃ­as)")
+            st.info(f"ℹ️ Se aplicará forward fill ({_n_nan_yr} celdas vacías)")
     with _dc2:
         st.caption(f"Columna {period_kind}: **{period_col}**")
 
     _auto_pt = _detect_period_type(df[period_col])
     if period_kind == "Mes":
-        _pt_map = {"month_numeric": "NumÃ©rico 1-12", "month_text_es": "Texto espaÃ±ol", "month_text_en": "Texto inglÃ©s"}
+        _pt_map = {"month_numeric": "Numérico 1-12", "month_text_es": "Texto español", "month_text_en": "Texto inglés"}
     else:
-        _pt_map = {"quarter_text_q": "Q1/Q2/Q3/Q4", "quarter_text_t": "1T/2T/3T/4T", "quarter_numeric": "NumÃ©rico 1-4"}
+        _pt_map = {"quarter_text_q": "Q1/Q2/Q3/Q4", "quarter_text_t": "1T/2T/3T/4T", "quarter_numeric": "Numérico 1-4"}
     _pt_keys = list(_pt_map.keys())
     _pt_labels = list(_pt_map.values())
     _default_idx = _pt_keys.index(_auto_pt) if _auto_pt in _pt_keys else 0
@@ -459,18 +459,18 @@ def _show_date_compose_panel(
         _prev_rows = []
         for _i in range(len(_prev_df)):
             _yr_o = _prev_df.iloc[_i][year_col]
-            _yr_d = f"NaNâ†’{_yr_filled.iloc[_i]}" if pd.isna(_yr_o) else str(_yr_o)
+            _yr_d = f"NaN→{_yr_filled.iloc[_i]}" if pd.isna(_yr_o) else str(_yr_o)
             _dt = _prev_dates.iloc[_i]
             _prev_rows.append({
-                "AÃ±o": _yr_d,
+                "Año": _yr_d,
                 period_kind: str(_prev_df.iloc[_i][period_col]),
-                "Fecha compuesta": _dt.strftime("%Y-%m-%d") if pd.notna(_dt) else "âŒ Error",
-                "": "âœ…" if pd.notna(_dt) else "âŒ",
+                "Fecha compuesta": _dt.strftime("%Y-%m-%d") if pd.notna(_dt) else "❌ Error",
+                "": "✅" if pd.notna(_dt) else "❌",
             })
         st.dataframe(pd.DataFrame(_prev_rows), hide_index=True, use_container_width=True)
         return _period_type, True
     except Exception as _e:
-        st.error(f"Error en composiciÃ³n de fecha: {_e}")
+        st.error(f"Error en composición de fecha: {_e}")
         return _period_type, False
 
 
@@ -479,12 +479,12 @@ def _apply_date_composition(
     cls_dict: dict,
     period_type: str | None,
 ) -> tuple[pd.DataFrame, str | None]:
-    """Apply date composition if cls_dict has AÃ±o+Mes/Trimestre columns.
+    """Apply date composition if cls_dict has Año+Mes/Trimestre columns.
 
     Returns (df_out, date_col_name). If composed, df_out has '_composed_date' column.
     If not, returns (df, existing Fecha col).
     """
-    year_col = next((c for c, t in cls_dict.items() if t == "AÃ±o"), None)
+    year_col = next((c for c, t in cls_dict.items() if t == "Año"), None)
     period_col = next((c for c, t in cls_dict.items() if t in ("Mes", "Trimestre")), None)
     if year_col and period_col and period_type:
         df_out = df.copy()
@@ -526,21 +526,21 @@ def _auto_classify_platform_columns(df: pd.DataFrame, plat_format: str) -> dict[
             if n_unique <= 2:
                 result[col] = "Ignorar"
             elif plat_format == "long":
-                result[col] = "DimensiÃ³n"
+                result[col] = "Dimensión"
             else:
                 result[col] = "Ignorar"
     return result
 
 
-# â”€â”€ Sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Sidebar ───────────────────────────────────────────────────────────────────
 
 with st.sidebar:
-    st.title("ðŸ” Dataset Auditor")
-    st.caption("v2.0 â€” Series Compare")
+    st.title("🔍 Dataset Auditor")
+    st.caption("v2.0 — Series Compare")
     st.markdown("---")
 
     # Reports folder
-    if st.button("ðŸ“‚ Abrir carpeta reportes", use_container_width=True, key="sidebar_open_reports"):
+    if st.button("📂 Abrir carpeta reportes", use_container_width=True, key="sidebar_open_reports"):
         _rdir = Path(__file__).parent / "reports"
         _rdir.mkdir(exist_ok=True)
         reveal_directory(_rdir)
@@ -553,7 +553,7 @@ with st.sidebar:
 
     # YAML config loader
     st.markdown("---")
-    with st.expander("âš™ï¸ Cargar config de matching YAML"):
+    with st.expander("⚙️ Cargar config de matching YAML"):
         _yaml_uploader = st.file_uploader(
             "Config YAML", type=["yaml", "yml", "json"], key="sidebar_yaml_uploader"
         )
@@ -568,10 +568,10 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    # ═══════════════════════════════════════════════════════════════════════
     # AUDIT section (logic unchanged)
-    # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-    st.subheader("ðŸ” AuditorÃ­a")
+    # ═══════════════════════════════════════════════════════════════════════
+    st.subheader("🔍 Auditoría")
 
     _audit_tab_mode = st.session_state.get("audit_tab_mode", "Source")
 
@@ -579,26 +579,26 @@ with st.sidebar:
     if _audit_tab_mode == "Source":
         df_audit_loaded = st.session_state.get("source_df")
         if df_audit_loaded is None:
-            st.caption("CargÃ¡ el dataset fuente en Compare (Paso 1).")
+            st.caption("Cargá el dataset fuente en Compare (Paso 1).")
     elif _audit_tab_mode == "Platform":
         df_audit_loaded = st.session_state.get("platform_df")
         if df_audit_loaded is None:
-            st.caption("CargÃ¡ el dataset plataforma en Compare (Paso 1).")
+            st.caption("Cargá el dataset plataforma en Compare (Paso 1).")
     else:
         audit_file = st.file_uploader(
-            "SubÃ­ dataset para auditar", type=["csv", "xlsx", "xls", "xlsb"], key="audit_sep_uploader"
+            "Subí dataset para auditar", type=["csv", "xlsx", "xls", "xlsb"], key="audit_sep_uploader"
         )
         if audit_file is not None:
             df_audit_loaded = load_file(audit_file, "audit_sep")
             if df_audit_loaded is not None:
-                st.success(f"{len(df_audit_loaded):,} Ã— {len(df_audit_loaded.columns)}")
+                st.success(f"{len(df_audit_loaded):,} × {len(df_audit_loaded.columns)}")
 
     st.markdown("**Config**")
-    config_mode = st.radio("Modo config", ["ðŸ” Auto", "ðŸ“„ Archivo YAML"],
+    config_mode = st.radio("Modo config", ["🔍 Auto", "📄 Archivo YAML"],
                            horizontal=True, key="config_mode")
     config_loaded: dict | None = None
 
-    if config_mode == "ðŸ“„ Archivo YAML":
+    if config_mode == "📄 Archivo YAML":
         uploaded_config = st.file_uploader(
             "Config YAML", type=["yaml", "yml", "json"], key="config_uploader"
         )
@@ -610,7 +610,7 @@ with st.sidebar:
                 st.error(f"Error en config: {e}")
     else:
         if df_audit_loaded is None:
-            st.caption("CargÃ¡ un dataset primero.")
+            st.caption("Cargá un dataset primero.")
         else:
             _detect_key = f"{id(df_audit_loaded)}_{df_audit_loaded.shape[0]}_{df_audit_loaded.shape[1]}"
             if st.session_state.get("_detected_key") != _detect_key:
@@ -630,7 +630,7 @@ with st.sidebar:
                 for note in notes:
                     shown[note["field"]] = note
                 for note in shown.values():
-                    icon = {"high": "âœ…", "medium": "âš ï¸", "low": "âŒ"}.get(note["confidence"], "â“")
+                    icon = {"high": "✅", "medium": "⚠️", "low": "❌"}.get(note["confidence"], "❓")
                     val = note["value"]
                     val_str = ", ".join(str(v) for v in val) if isinstance(val, list) else str(val)
                     st.markdown(
@@ -698,7 +698,7 @@ with st.sidebar:
                 float(detected.get("outlier_zscore_threshold", 3.5)), step=0.5, key="ui_outlier",
             )
             ui_lag = st.number_input(
-                "Lag aceptable (dÃ­as)", min_value=0,
+                "Lag aceptable (días)", min_value=0,
                 value=int(detected.get("acceptable_lag_days", 3)), key="ui_lag",
             )
 
@@ -718,7 +718,7 @@ with st.sidebar:
 
     can_audit = df_audit_loaded is not None and config_loaded is not None
     run_audit_btn = st.button(
-        "â–¶ Run Audit", disabled=not can_audit,
+        "▶ Run Audit", disabled=not can_audit,
         use_container_width=True, key="run_audit_btn",
     )
 
@@ -735,9 +735,9 @@ with st.sidebar:
         reveal_directory(reports_dir)
 
 
-# â”€â”€ Run Audit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Run Audit ─────────────────────────────────────────────────────────────────
 if run_audit_btn and can_audit:
-    with st.spinner("Ejecutando auditorÃ­a..."):
+    with st.spinner("Ejecutando auditoría..."):
         try:
             prev_snapshot = load_snapshot(config_loaded["dataset_name"])
             report = audit_dataset(df_audit_loaded, config_loaded, prev_snapshot=prev_snapshot)
@@ -748,11 +748,11 @@ if run_audit_btn and can_audit:
             save_snapshot(df_audit_loaded, config_loaded["dataset_name"])
             st.toast("Snapshot guardado.")
         except Exception as exc:
-            st.error(f"Error durante la auditorÃ­a: {exc}")
+            st.error(f"Error durante la auditoría: {exc}")
             if os.getenv("DEBUG"):
                 st.exception(exc)
 
-# â”€â”€ Export audit report â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Export audit report ───────────────────────────────────────────────────────
 if export_clicked and "audit_result" in st.session_state:
     try:
         path = save_report(st.session_state["audit_result"])
@@ -761,17 +761,17 @@ if export_clicked and "audit_result" in st.session_state:
         st.sidebar.error(f"Error al exportar: {exc}")
 
 
-# â”€â”€ Main tabs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-tab_compare, tab_audit, tab_settings = st.tabs(["ðŸ”„ Compare", "ðŸ” Audit", "âš™ï¸ Settings"])
+# ── Main tabs ─────────────────────────────────────────────────────────────────
+tab_compare, tab_audit, tab_settings = st.tabs(["🔄 Compare", "🔍 Audit", "⚙️ Settings"])
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-# TAB 1 â€” COMPARE (6-step series flow)
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ═════════════════════════════════════════════════════════════════════════════
+# TAB 1 — COMPARE (6-step series flow)
+# ═════════════════════════════════════════════════════════════════════════════
 with tab_compare:
-    st.markdown("## ðŸ”„ Compare por Series")
+    st.markdown("## 🔄 Compare por Series")
 
-    # â”€â”€ Compute step completion state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── Compute step completion state ─────────────────────────────────────────
     _s1_done = (
         st.session_state.get("source_df") is not None
         and st.session_state.get("platform_df") is not None
@@ -788,9 +788,9 @@ with tab_compare:
     _s4_done = st.session_state.get("matching_confirmed", False)
     _s5_done = "compare_result" in st.session_state
 
-    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ─────────────────────────────────────────────────────────────────────────
     # PASO 1: Cargar Datasets
-    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ─────────────────────────────────────────────────────────────────────────
     with st.expander(
         f"{_sicon(_s1_done, True)} PASO 1: Cargar Datasets",
         expanded=not _s1_done,
@@ -798,7 +798,7 @@ with tab_compare:
         _col_src, _col_plat = st.columns(2)
 
         with _col_src:
-            st.markdown("**ðŸ“ Source (Fuente cruda)**")
+            st.markdown("**📁 Source (Fuente cruda)**")
 
             # Format selector
             _fmt_options = ["Long", "Wide", "Wide Transpuesto"]
@@ -808,7 +808,7 @@ with tab_compare:
             _fmt_code_map = {"Long": "long", "Wide": "wide", "Wide Transpuesto": "wide_transposed"}
             _new_fmt_code = _fmt_code_map[_fmt_radio]
 
-            # Detect format change â†’ clear downstream
+            # Detect format change → clear downstream
             if st.session_state.get("_last_source_format") != _new_fmt_code:
                 if "_last_source_format" in st.session_state:
                     for _k in ["classification_confirmed", "source_column_classification",
@@ -841,11 +841,11 @@ with tab_compare:
 
             _src_df_cur = st.session_state.get("source_df")
             if _src_df_cur is not None:
-                st.caption(f"**{len(_src_df_cur):,} filas Ã— {len(_src_df_cur.columns)} cols**")
+                st.caption(f"**{len(_src_df_cur):,} filas × {len(_src_df_cur.columns)} cols**")
                 st.dataframe(_src_df_cur.head(3), use_container_width=True, hide_index=True)
 
         with _col_plat:
-            st.markdown("**ðŸ“ Platform (Alphacast)**")
+            st.markdown("**📁 Platform (Alphacast)**")
 
             # Format selector
             _plat_fmt_options = ["Long", "Wide"]
@@ -855,7 +855,7 @@ with tab_compare:
             _plat_fmt_code_map = {"Long": "long", "Wide": "wide"}
             _new_plat_fmt_code = _plat_fmt_code_map[_plat_fmt_radio]
 
-            # Detect format change â†’ clear downstream
+            # Detect format change → clear downstream
             if st.session_state.get("_last_platform_format") != _new_plat_fmt_code:
                 if "_last_platform_format" in st.session_state:
                     for _k in ["platform_classification_confirmed", "platform_column_classification",
@@ -868,7 +868,7 @@ with tab_compare:
                 st.session_state["_last_platform_format"] = _new_plat_fmt_code
             st.session_state["platform_format"] = _new_plat_fmt_code
 
-            # â”€â”€ Origen: Subir archivo vs Alphacast API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            # ── Origen: Subir archivo vs Alphacast API ────────────────────────
             _plat_origen = st.radio(
                 "Origen:", ["Subir archivo", "Descargar de Alphacast"],
                 horizontal=True, key="platform_source_radio",
@@ -913,7 +913,7 @@ with tab_compare:
                             st.session_state.pop("alphacast_dataset_name", None)
 
             else:
-                # â”€â”€ Alphacast API panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                # ── Alphacast API panel ───────────────────────────────────────
                 _ac_key = st.session_state.get("alphacast_api_key")
                 _ac_source = st.session_state.get("alphacast_api_key_source")
                 _ac_show_input = st.session_state.get("_ac_show_key_input", False)
@@ -968,9 +968,9 @@ with tab_compare:
                         "Dataset ID:", min_value=1, step=1,
                         value=st.session_state.get("alphacast_dataset_id") or 1,
                         key="plat_ac_dataset_id",
-                        help="Lo encontrÃ¡s en la URL: alphacast.io/datasets/{ID}",
+                        help="Lo encontrás en la URL: alphacast.io/datasets/{ID}",
                     )
-                    if st.button("â¬‡ï¸ Descargar dataset", key="plat_ac_download", type="primary"):
+                    if st.button("⬇️ Descargar dataset", key="plat_ac_download", type="primary"):
                         with st.spinner("Descargando desde Alphacast..."):
                             _ac_result = fetch_dataset(
                                 st.session_state["alphacast_api_key"], int(_ac_ds_id)
@@ -990,31 +990,31 @@ with tab_compare:
                             st.rerun()
                         else:
                             st.error(
-                                "âŒ No se pudo descargar. VerificÃ¡ el ID y tu conexiÃ³n."
+                                "❌ No se pudo descargar. Verificá el ID y tu conexión."
                             )
 
                     # Show current Alphacast dataset info if loaded
                     if st.session_state.get("alphacast_dataset_name"):
                         st.caption(
-                            f"âœ… **{st.session_state['alphacast_dataset_name']}** "
+                            f"✅ **{st.session_state['alphacast_dataset_name']}** "
                             f"(ID #{st.session_state['alphacast_dataset_id']})"
                         )
 
             _plat_df_cur = st.session_state.get("platform_df")
             if _plat_df_cur is not None:
-                st.caption(f"**{len(_plat_df_cur):,} filas Ã— {len(_plat_df_cur.columns)} cols**")
+                st.caption(f"**{len(_plat_df_cur):,} filas × {len(_plat_df_cur.columns)} cols**")
                 st.dataframe(_plat_df_cur.head(3), use_container_width=True, hide_index=True)
 
         if _s1_done:
-            st.success("Ambos datasets cargados. ContinuÃ¡ con el Paso 2.")
+            st.success("Ambos datasets cargados. Continuá con el Paso 2.")
         elif st.session_state.get("source_df") is not None:
-            st.info("CargÃ¡ el dataset Platform para continuar.")
+            st.info("Cargá el dataset Platform para continuar.")
         elif st.session_state.get("platform_df") is not None:
-            st.info("CargÃ¡ el dataset Source para continuar.")
+            st.info("Cargá el dataset Source para continuar.")
 
-    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ─────────────────────────────────────────────────────────────────────────
     # PASO 2: Clasificar Columnas del Source
-    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ─────────────────────────────────────────────────────────────────────────
     if _s1_done:
         with st.expander(
             f"{_sicon(_s2_done, not _s2_done)} PASO 2: Clasificar Columnas",
@@ -1034,7 +1034,7 @@ with tab_compare:
             _existing_cls = st.session_state.get("source_column_classification", _auto_cls)
 
             if _src_fmt == "wide_transposed":
-                st.markdown("**Formato Wide Transpuesto** â€” cada fila es una serie, las columnas son fechas.")
+                st.markdown("**Formato Wide Transpuesto** — cada fila es una serie, las columnas son fechas.")
                 _all_cols = list(_src_df.columns)
                 _entity_col = st.selectbox(
                     "Columna de entidades (nombre de la serie):",
@@ -1053,7 +1053,7 @@ with tab_compare:
                 except Exception:
                     st.warning("No se pudo parsear los headers como fechas.")
 
-                if st.button("âœ… Confirmar (Wide Transpuesto)", key="confirm_cls_transposed"):
+                if st.button("✅ Confirmar (Wide Transpuesto)", key="confirm_cls_transposed"):
                     st.session_state["source_column_classification"] = {"entity_col": _entity_col}
                     st.session_state["classification_confirmed"] = True
                     for _k in ["source_extraction", "platform_extraction", "matching_result",
@@ -1064,11 +1064,11 @@ with tab_compare:
             else:
                 # Long or Wide: show data_editor table
                 if _src_fmt == "long":
-                    _cls_options = ["Fecha", "AÃ±o", "Mes", "Trimestre", "DimensiÃ³n", "Valor", "Ignorar"]
-                    st.caption("**Fecha** = col. de fechas Â· **AÃ±o+Mes** o **AÃ±o+Trimestre** = fecha compuesta Â· **DimensiÃ³n** = categorÃ­a Â· **Valor** = valor numÃ©rico Â· **Ignorar** = excluir")
+                    _cls_options = ["Fecha", "Año", "Mes", "Trimestre", "Dimensión", "Valor", "Ignorar"]
+                    st.caption("**Fecha** = col. de fechas · **Año+Mes** o **Año+Trimestre** = fecha compuesta · **Dimensión** = categoría · **Valor** = valor numérico · **Ignorar** = excluir")
                 else:
-                    _cls_options = ["Fecha", "AÃ±o", "Mes", "Trimestre", "Serie", "Ignorar"]
-                    st.caption("**Fecha** = col. de fechas Â· **AÃ±o+Mes** o **AÃ±o+Trimestre** = fecha compuesta Â· **Serie** = columna numÃ©rica Â· **Ignorar** = excluir")
+                    _cls_options = ["Fecha", "Año", "Mes", "Trimestre", "Serie", "Ignorar"]
+                    st.caption("**Fecha** = col. de fechas · **Año+Mes** o **Año+Trimestre** = fecha compuesta · **Serie** = columna numérica · **Ignorar** = excluir")
 
                 _cls_rows = []
                 for _col in _src_df.columns:
@@ -1079,7 +1079,7 @@ with tab_compare:
                     _cls_rows.append({
                         "Columna": _col,
                         "Tipo detectado": _det_type,
-                        "Tu clasificaciÃ³n": _cur_cls,
+                        "Tu clasificación": _cur_cls,
                     })
 
                 _cls_df = pd.DataFrame(_cls_rows)
@@ -1088,7 +1088,7 @@ with tab_compare:
                     column_config={
                         "Columna": st.column_config.TextColumn(disabled=True),
                         "Tipo detectado": st.column_config.TextColumn(disabled=True),
-                        "Tu clasificaciÃ³n": st.column_config.SelectboxColumn(
+                        "Tu clasificación": st.column_config.SelectboxColumn(
                             options=_cls_options, required=True,
                         ),
                     },
@@ -1097,9 +1097,9 @@ with tab_compare:
                     key="classification_editor",
                 )
 
-                # Date composition panel (shown when AÃ±o + Mes/Trimestre selected)
-                _src_cls_dict = dict(zip(_edited_cls["Columna"], _edited_cls["Tu clasificaciÃ³n"]))
-                _src_year_col = next((c for c, t in _src_cls_dict.items() if t == "AÃ±o"), None)
+                # Date composition panel (shown when Año + Mes/Trimestre selected)
+                _src_cls_dict = dict(zip(_edited_cls["Columna"], _edited_cls["Tu clasificación"]))
+                _src_year_col = next((c for c, t in _src_cls_dict.items() if t == "Año"), None)
                 _src_period_col = next((c for c, t in _src_cls_dict.items() if t in ("Mes", "Trimestre")), None)
                 _src_period_kind = next((t for t in _src_cls_dict.values() if t in ("Mes", "Trimestre")), None)
                 _src_compose_valid = True
@@ -1110,39 +1110,39 @@ with tab_compare:
                     )
 
                 # Validate
-                _n_fecha = (_edited_cls["Tu clasificaciÃ³n"] == "Fecha").sum()
-                _n_year = (_edited_cls["Tu clasificaciÃ³n"] == "AÃ±o").sum()
-                _n_period = (_edited_cls["Tu clasificaciÃ³n"].isin(["Mes", "Trimestre"])).sum()
+                _n_fecha = (_edited_cls["Tu clasificación"] == "Fecha").sum()
+                _n_year = (_edited_cls["Tu clasificación"] == "Año").sum()
+                _n_period = (_edited_cls["Tu clasificación"].isin(["Mes", "Trimestre"])).sum()
                 _has_date = _n_fecha >= 1 or (_n_year >= 1 and _n_period >= 1)
                 _can_confirm = False
                 if not _has_date:
-                    st.error("NecesitÃ¡s al menos 1 columna Fecha, o columnas AÃ±o + Mes/Trimestre.")
+                    st.error("Necesitás al menos 1 columna Fecha, o columnas Año + Mes/Trimestre.")
                 else:
                     if _n_fecha > 1:
-                        st.warning("MÃ¡s de 1 columna Fecha â€” se usarÃ¡ la primera.")
+                        st.warning("Más de 1 columna Fecha — se usará la primera.")
                     if not _src_compose_valid and _src_year_col:
-                        st.error("Error en la composiciÃ³n de fecha. RevisÃ¡ el formato.")
+                        st.error("Error en la composición de fecha. Revisá el formato.")
                     else:
                         _can_confirm = True
 
                 if _src_fmt == "long":
-                    _n_val = (_edited_cls["Tu clasificaciÃ³n"] == "Valor").sum()
+                    _n_val = (_edited_cls["Tu clasificación"] == "Valor").sum()
                     if _n_val == 0:
                         st.error("Debe haber al menos 1 columna de tipo Valor.")
                         _can_confirm = False
                     elif _n_val > 1:
-                        st.warning("MÃ¡s de 1 columna Valor â€” se usarÃ¡ la primera.")
+                        st.warning("Más de 1 columna Valor — se usará la primera.")
                 elif _src_fmt == "wide":
-                    _n_serie = (_edited_cls["Tu clasificaciÃ³n"] == "Serie").sum()
+                    _n_serie = (_edited_cls["Tu clasificación"] == "Serie").sum()
                     if _n_serie == 0:
                         st.error("Debe haber al menos 1 columna de tipo Serie.")
                         _can_confirm = False
 
                 if st.button(
-                    "âœ… Confirmar clasificaciÃ³n Source", key="confirm_cls",
+                    "✅ Confirmar clasificación Source", key="confirm_cls",
                     type="primary", disabled=not _can_confirm,
                 ):
-                    _cls_result = dict(zip(_edited_cls["Columna"], _edited_cls["Tu clasificaciÃ³n"]))
+                    _cls_result = dict(zip(_edited_cls["Columna"], _edited_cls["Tu clasificación"]))
                     st.session_state["source_column_classification"] = _cls_result
                     st.session_state["classification_confirmed"] = True
                     st.session_state["source_period_type"] = _src_period_type
@@ -1153,17 +1153,17 @@ with tab_compare:
                         st.session_state.pop(_k, None)
                     st.rerun()
 
-            # â”€â”€ Platform classification â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            # ── Platform classification ───────────────────────────────────────
             if st.session_state.get("classification_confirmed", False):
                 st.markdown("---")
-                st.markdown("**ðŸ“ ClasificaciÃ³n Platform (Alphacast)**")
+                st.markdown("**📁 Clasificación Platform (Alphacast)**")
                 _plat_df_cls = st.session_state["platform_df"]
                 _plat_fmt_cls = st.session_state.get("platform_format", "long")
 
                 if st.session_state.get("platform_classification_confirmed", False):
                     _plat_cls_done = st.session_state["platform_column_classification"]
-                    st.success(f"ClasificaciÃ³n Platform confirmada: {len(_plat_cls_done)} columnas.")
-                    if st.button("âœï¸ Editar clasificaciÃ³n Platform", key="edit_plat_cls"):
+                    st.success(f"Clasificación Platform confirmada: {len(_plat_cls_done)} columnas.")
+                    if st.button("✏️ Editar clasificación Platform", key="edit_plat_cls"):
                         st.session_state.pop("platform_classification_confirmed", None)
                         for _k in ["platform_extraction", "matching_result", "matching_confirmed",
                                     "_auto_matching_result", "compare_result",
@@ -1182,11 +1182,11 @@ with tab_compare:
                     _existing_plat_cls = st.session_state.get("platform_column_classification", _auto_cls_plat)
 
                     if _plat_fmt_cls == "long":
-                        _plat_cls_options = ["Fecha", "AÃ±o", "Mes", "Trimestre", "DimensiÃ³n", "Valor", "Ignorar"]
-                        st.caption("**Fecha** = col. de fechas Â· **AÃ±o+Mes** o **AÃ±o+Trimestre** = fecha compuesta Â· **DimensiÃ³n** = categorÃ­a Â· **Valor** = valor numÃ©rico Â· **Ignorar** = excluir")
+                        _plat_cls_options = ["Fecha", "Año", "Mes", "Trimestre", "Dimensión", "Valor", "Ignorar"]
+                        st.caption("**Fecha** = col. de fechas · **Año+Mes** o **Año+Trimestre** = fecha compuesta · **Dimensión** = categoría · **Valor** = valor numérico · **Ignorar** = excluir")
                     else:
-                        _plat_cls_options = ["Fecha", "AÃ±o", "Mes", "Trimestre", "Valor", "Ignorar"]
-                        st.caption("**Fecha** = col. de fechas Â· **AÃ±o+Mes** o **AÃ±o+Trimestre** = fecha compuesta Â· **Valor** = columna numÃ©rica Â· **Ignorar** = excluir")
+                        _plat_cls_options = ["Fecha", "Año", "Mes", "Trimestre", "Valor", "Ignorar"]
+                        st.caption("**Fecha** = col. de fechas · **Año+Mes** o **Año+Trimestre** = fecha compuesta · **Valor** = columna numérica · **Ignorar** = excluir")
 
                     _plat_cls_rows = []
                     for _col in _plat_df_cls.columns:
@@ -1197,11 +1197,11 @@ with tab_compare:
                         _n_uniq = _plat_df_cls[_col].nunique() if not pd.api.types.is_numeric_dtype(_plat_df_cls[_col]) else None
                         _type_note = _det_type
                         if _n_uniq is not None and _n_uniq <= 2:
-                            _type_note += f" âš ï¸ {_n_uniq} valor Ãºnico"
+                            _type_note += f" ⚠️ {_n_uniq} valor único"
                         _plat_cls_rows.append({
                             "Columna": _col,
                             "Tipo detectado": _type_note,
-                            "Tu clasificaciÃ³n": _cur_plat_cls,
+                            "Tu clasificación": _cur_plat_cls,
                         })
 
                     _plat_cls_df = pd.DataFrame(_plat_cls_rows)
@@ -1210,7 +1210,7 @@ with tab_compare:
                         column_config={
                             "Columna": st.column_config.TextColumn(disabled=True),
                             "Tipo detectado": st.column_config.TextColumn(disabled=True),
-                            "Tu clasificaciÃ³n": st.column_config.SelectboxColumn(
+                            "Tu clasificación": st.column_config.SelectboxColumn(
                                 options=_plat_cls_options, required=True,
                             ),
                         },
@@ -1220,8 +1220,8 @@ with tab_compare:
                     )
 
                     # Date composition panel for Platform
-                    _plat_cls_dict_edit = dict(zip(_edited_plat_cls["Columna"], _edited_plat_cls["Tu clasificaciÃ³n"]))
-                    _plat_year_col = next((c for c, t in _plat_cls_dict_edit.items() if t == "AÃ±o"), None)
+                    _plat_cls_dict_edit = dict(zip(_edited_plat_cls["Columna"], _edited_plat_cls["Tu clasificación"]))
+                    _plat_year_col = next((c for c, t in _plat_cls_dict_edit.items() if t == "Año"), None)
                     _plat_period_col = next((c for c, t in _plat_cls_dict_edit.items() if t in ("Mes", "Trimestre")), None)
                     _plat_period_kind = next((t for t in _plat_cls_dict_edit.values() if t in ("Mes", "Trimestre")), None)
                     _plat_compose_valid = True
@@ -1231,30 +1231,30 @@ with tab_compare:
                             _plat_df_cls, _plat_year_col, _plat_period_col, _plat_period_kind, "plat_compose"
                         )
 
-                    _plat_n_fecha = (_edited_plat_cls["Tu clasificaciÃ³n"] == "Fecha").sum()
-                    _plat_n_year = (_edited_plat_cls["Tu clasificaciÃ³n"] == "AÃ±o").sum()
-                    _plat_n_period = (_edited_plat_cls["Tu clasificaciÃ³n"].isin(["Mes", "Trimestre"])).sum()
+                    _plat_n_fecha = (_edited_plat_cls["Tu clasificación"] == "Fecha").sum()
+                    _plat_n_year = (_edited_plat_cls["Tu clasificación"] == "Año").sum()
+                    _plat_n_period = (_edited_plat_cls["Tu clasificación"].isin(["Mes", "Trimestre"])).sum()
                     _plat_has_date = _plat_n_fecha >= 1 or (_plat_n_year >= 1 and _plat_n_period >= 1)
                     _plat_can_confirm = False
                     if not _plat_has_date:
-                        st.error("NecesitÃ¡s al menos 1 columna Fecha, o columnas AÃ±o + Mes/Trimestre.")
+                        st.error("Necesitás al menos 1 columna Fecha, o columnas Año + Mes/Trimestre.")
                     else:
                         if not _plat_compose_valid and _plat_year_col:
-                            st.error("Error en la composiciÃ³n de fecha. RevisÃ¡ el formato.")
+                            st.error("Error en la composición de fecha. Revisá el formato.")
                         else:
                             _plat_can_confirm = True
 
-                    _plat_n_val = (_edited_plat_cls["Tu clasificaciÃ³n"] == "Valor").sum()
+                    _plat_n_val = (_edited_plat_cls["Tu clasificación"] == "Valor").sum()
                     if _plat_n_val == 0:
                         st.error("Debe haber al menos 1 columna de tipo Valor.")
                         _plat_can_confirm = False
 
                     if st.button(
-                        "âœ… Confirmar clasificaciÃ³n Platform", key="confirm_plat_cls",
+                        "✅ Confirmar clasificación Platform", key="confirm_plat_cls",
                         type="primary", disabled=not _plat_can_confirm,
                     ):
                         _plat_cls_result = dict(zip(
-                            _edited_plat_cls["Columna"], _edited_plat_cls["Tu clasificaciÃ³n"]
+                            _edited_plat_cls["Columna"], _edited_plat_cls["Tu clasificación"]
                         ))
                         st.session_state["platform_column_classification"] = _plat_cls_result
                         st.session_state["platform_classification_confirmed"] = True
@@ -1266,9 +1266,9 @@ with tab_compare:
                             st.session_state.pop(_k, None)
                         st.rerun()
 
-    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ─────────────────────────────────────────────────────────────────────────
     # PASO 3: Extraer Series (auto-runs when step 2 is done)
-    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ─────────────────────────────────────────────────────────────────────────
     if _s2_done and not _s3_done:
         _src_df_ex = st.session_state["source_df"]
         _plat_df_ex = st.session_state["platform_df"]
@@ -1277,22 +1277,22 @@ with tab_compare:
         _plat_fmt_ex = st.session_state.get("platform_format", "long")
         _plat_cls_ex = st.session_state.get("platform_column_classification", {})
 
-        with st.expander("ðŸ”„ PASO 3: Extraer Series", expanded=True):
+        with st.expander("🔄 PASO 3: Extraer Series", expanded=True):
             _ex_status = st.empty()
             _ex_status.info("Extrayendo series...")
             try:
-                # â€” Source extraction â€”
+                # — Source extraction —
                 _src_ext = None
                 if _fmt_ex == "long":
                     _src_df_composed, _date_col_ex = _apply_date_composition(
                         _src_df_ex, _cls_ex, st.session_state.get("source_period_type")
                     )
-                    _dim_cols_ex = [c for c, t in _cls_ex.items() if t == "DimensiÃ³n"]
+                    _dim_cols_ex = [c for c, t in _cls_ex.items() if t == "Dimensión"]
                     _val_col_ex = next(
                         (c for c, t in _cls_ex.items() if t == "Valor"), None
                     )
                     if not _date_col_ex or not _val_col_ex:
-                        st.error("ClasificaciÃ³n Source incompleta: falta columna Fecha o Valor.")
+                        st.error("Clasificación Source incompleta: falta columna Fecha o Valor.")
                     else:
                         _src_ext = extract_series_long(_src_df_composed, _date_col_ex, _dim_cols_ex, _val_col_ex)
 
@@ -1302,7 +1302,7 @@ with tab_compare:
                     )
                     _val_cols_ex = [c for c, t in _cls_ex.items() if t == "Serie"]
                     if not _date_col_ex or not _val_cols_ex:
-                        st.error("ClasificaciÃ³n Source incompleta: falta Fecha o columnas Serie.")
+                        st.error("Clasificación Source incompleta: falta Fecha o columnas Serie.")
                     else:
                         _src_ext = extract_series_wide(_src_df_composed, _date_col_ex, _val_cols_ex)
 
@@ -1310,7 +1310,7 @@ with tab_compare:
                     _entity_col_ex = _cls_ex.get("entity_col")
                     _src_ext = extract_series_wide_transposed(_src_df_ex, _entity_col_ex)
 
-                # â€” Platform extraction â€”
+                # — Platform extraction —
                 _plat_ext = None
                 _plat_df_composed, _plat_date_col_ex = _apply_date_composition(
                     _plat_df_ex, _plat_cls_ex, st.session_state.get("platform_period_type")
@@ -1318,16 +1318,16 @@ with tab_compare:
                 if _plat_fmt_ex == "wide":
                     _plat_val_cols_ex = [c for c, t in _plat_cls_ex.items() if t == "Valor"]
                     if not _plat_date_col_ex or not _plat_val_cols_ex:
-                        st.error("ClasificaciÃ³n Platform incompleta: falta Fecha o columnas Valor.")
+                        st.error("Clasificación Platform incompleta: falta Fecha o columnas Valor.")
                     else:
                         _plat_ext = extract_series_wide(_plat_df_composed, _plat_date_col_ex, _plat_val_cols_ex)
                 else:  # long
-                    _plat_dim_cols_ex = [c for c, t in _plat_cls_ex.items() if t == "DimensiÃ³n"]
+                    _plat_dim_cols_ex = [c for c, t in _plat_cls_ex.items() if t == "Dimensión"]
                     _plat_val_col_ex = next(
                         (c for c, t in _plat_cls_ex.items() if t == "Valor"), None
                     )
                     if not _plat_date_col_ex or not _plat_val_col_ex:
-                        st.error("ClasificaciÃ³n Platform incompleta: falta Fecha o columna Valor.")
+                        st.error("Clasificación Platform incompleta: falta Fecha o columna Valor.")
                     else:
                         _plat_ext = extract_series_long(
                             _plat_df_composed, _plat_date_col_ex, _plat_dim_cols_ex, _plat_val_col_ex
@@ -1338,12 +1338,12 @@ with tab_compare:
                     st.session_state["platform_extraction"] = _plat_ext
                     _s3_done = True
                     _ex_status.success(
-                        f"ExtraÃ­das {_src_ext.total_series} series source y "
+                        f"Extraídas {_src_ext.total_series} series source y "
                         f"{_plat_ext.total_series} series platform."
                     )
 
             except Exception as _ex_err:
-                st.error(f"Error en extracciÃ³n: {_ex_err}")
+                st.error(f"Error en extracción: {_ex_err}")
                 st.exception(_ex_err)
 
     if _s3_done:
@@ -1351,7 +1351,7 @@ with tab_compare:
         _plat_ext = st.session_state["platform_extraction"]
 
         with st.expander(
-            f"âœ… PASO 3: Series ExtraÃ­das â€” {_src_ext.total_series} source Â· {_plat_ext.total_series} platform",
+            f"✅ PASO 3: Series Extraídas — {_src_ext.total_series} source · {_plat_ext.total_series} platform",
             expanded=False,
         ):
             _c3a, _c3b = st.columns(2)
@@ -1374,7 +1374,7 @@ with tab_compare:
                 st.dataframe(pd.DataFrame(_plat_tbl), hide_index=True,
                              use_container_width=True, height=250)
 
-            with st.expander("ðŸ“‹ Logs de extracciÃ³n"):
+            with st.expander("📋 Logs de extracción"):
                 _lc1, _lc2 = st.columns(2)
                 with _lc1:
                     st.markdown("**Source:**")
@@ -1385,14 +1385,14 @@ with tab_compare:
                     for _lg in _plat_ext.extraction_log:
                         st.caption(_lg)
 
-    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ─────────────────────────────────────────────────────────────────────────
     # PASO 3b: Seleccionar Series
-    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ─────────────────────────────────────────────────────────────────────────
     if _s3_done:
         _src_ext_sel = st.session_state["source_extraction"]
         _plat_ext_sel = st.session_state["platform_extraction"]
 
-        # â”€â”€ Init / reset platform selection state when dataset identity changes
+        # ── Init / reset platform selection state when dataset identity changes
         _plat_id_3b = "|".join(s.name for s in _plat_ext_sel.series)
         if st.session_state.get("_sel_plat_id") != _plat_id_3b:
             st.session_state["_sel_plat_id"] = _plat_id_3b
@@ -1408,10 +1408,10 @@ with tab_compare:
         ):
             _c_sel_src, _c_sel_plat = st.columns(2)
 
-            # â”€â”€ Source: all series enter the pool automatically â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            # ── Source: all series enter the pool automatically ───────────────
             with _c_sel_src:
-                st.markdown(f"**ðŸ“ Source: {_src_ext_sel.total_series} series disponibles**")
-                st.caption("Todas las series entran automÃ¡ticamente al pool de matching.")
+                st.markdown(f"**📁 Source: {_src_ext_sel.total_series} series disponibles**")
+                st.caption("Todas las series entran automáticamente al pool de matching.")
                 with st.expander("Ver series"):
                     _src_info_df = pd.DataFrame([
                         {"Nombre": _s.name, "Puntos": _s.row_count,
@@ -1420,10 +1420,10 @@ with tab_compare:
                     ])
                     st.dataframe(_src_info_df, hide_index=True, use_container_width=True)
 
-            # â”€â”€ Platform: user selects which series to verify â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            # ── Platform: user selects which series to verify ─────────────────
             with _c_sel_plat:
-                st.markdown(f"**ðŸ“ Platform: {_plat_ext_sel.total_series} series extraÃ­das**")
-                st.caption("SeleccionÃ¡ quÃ© series querÃ©s verificar contra la fuente:")
+                st.markdown(f"**📁 Platform: {_plat_ext_sel.total_series} series extraídas**")
+                st.caption("Seleccioná qué series querés verificar contra la fuente:")
                 _pb1, _pb2 = st.columns(2)
                 with _pb1:
                     if st.button("Seleccionar todo", key="sel_plat_all"):
@@ -1463,8 +1463,8 @@ with tab_compare:
                 )
                 _n_plat_sel = int(_edited_plat_df["Incluir"].sum())
                 st.caption(
-                    f"{len(_edited_plat_df)} series Â· "
-                    f"**{_n_plat_sel} seleccionadas** Â· "
+                    f"{len(_edited_plat_df)} series · "
+                    f"**{_n_plat_sel} seleccionadas** · "
                     f"{len(_edited_plat_df) - _n_plat_sel} descartadas"
                 )
 
@@ -1473,10 +1473,10 @@ with tab_compare:
             )
 
             if not _selected_plat_names:
-                st.warning("SeleccionÃ¡ al menos 1 serie Platform para continuar.")
+                st.warning("Seleccioná al menos 1 serie Platform para continuar.")
 
             if st.button(
-                "âœ… Confirmar series", key="confirm_series_sel",
+                "✅ Confirmar series", key="confirm_series_sel",
                 type="primary", disabled=not bool(_selected_plat_names),
             ):
                 # All source series enter the pool automatically
@@ -1494,13 +1494,13 @@ with tab_compare:
             _sel_plat_names = st.session_state["platform_selected_series"]
             _sel_src_all = st.session_state.get("source_selected_series", [])
             st.caption(
-                f"Pool source: **{len(_sel_src_all)}** series Â· "
+                f"Pool source: **{len(_sel_src_all)}** series · "
                 f"Verificando: **{len(_sel_plat_names)}** series platform"
             )
 
-    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ─────────────────────────────────────────────────────────────────────────
     # PASO 4: Matchear Series
-    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ─────────────────────────────────────────────────────────────────────────
     if _s3_done and _s3_selection_done:
         _src_ext4 = st.session_state["source_extraction"]
         _plat_ext4 = st.session_state["platform_extraction"]
@@ -1532,21 +1532,21 @@ with tab_compare:
         _auto_mr = st.session_state["_auto_matching_result"]
 
         with st.expander(
-            f"{_sicon(_s4_done, not _s4_done)} PASO 4: Matchear Series â€” "
+            f"{_sicon(_s4_done, not _s4_done)} PASO 4: Matchear Series — "
             f"{_auto_mr.matched_count}/{_plat_ext4_filtered.total_series} platform matched",
             expanded=not _s4_done,
         ):
             st.markdown(
-                f"**Matching automÃ¡tico: {_auto_mr.matched_count} de "
+                f"**Matching automático: {_auto_mr.matched_count} de "
                 f"{_plat_ext4_filtered.total_series} series platform matcheadas**"
             )
 
-            # â”€â”€ Auto-matches table with undo checkboxes (CAMBIO 4) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            # ── Auto-matches table with undo checkboxes (CAMBIO 4) ────────────
             _unmatched_src4 = _auto_mr.unmatched_source
             _unmatched_plat4 = _auto_mr.unmatched_platform
 
             if _auto_mr.matches:
-                st.markdown(f"**Matches automÃ¡ticos ({_auto_mr.matched_count}):**")
+                st.markdown(f"**Matches automáticos ({_auto_mr.matched_count}):**")
                 _match_data4 = []
                 for _m4 in _auto_mr.matches:
                     _match_data4.append({
@@ -1560,7 +1560,7 @@ with tab_compare:
                 _edited_matches4 = st.data_editor(
                     _df_matches4,
                     column_config={
-                        "Incluir": st.column_config.CheckboxColumn("âœ…", default=True, width="small"),
+                        "Incluir": st.column_config.CheckboxColumn("✅", default=True, width="small"),
                         "Platform": st.column_config.TextColumn("Serie Platform", disabled=True),
                         "Source": st.column_config.TextColumn("Serie Source", disabled=True),
                         "Tipo": st.column_config.TextColumn("Tipo", disabled=True, width="small"),
@@ -1597,27 +1597,27 @@ with tab_compare:
             }
             _avail_src_objs4.update(_deselected_src_objs4)
 
-            # â”€â”€ Platform series sin match â†’ manual source assignment (CAMBIO 5) â”€
+            # ── Platform series sin match → manual source assignment (CAMBIO 5) ─
             if _all_unmatched_plat4:
-                st.markdown(f"**âš ï¸ Series Platform sin match ({len(_all_unmatched_plat4)}):**")
+                st.markdown(f"**⚠️ Series Platform sin match ({len(_all_unmatched_plat4)}):**")
                 for _ip4, _up4 in enumerate(_all_unmatched_plat4):
                     _ua4, _ub4 = st.columns([2, 3])
                     with _ua4:
-                        st.markdown(f"âš ï¸ **{_up4.series.name}**")
+                        st.markdown(f"⚠️ **{_up4.series.name}**")
                         st.caption(
-                            f"{_up4.series.row_count} pts Â· "
-                            f"{_up4.series.date_range[0]} â†’ {_up4.series.date_range[1]}"
+                            f"{_up4.series.row_count} pts · "
+                            f"{_up4.series.date_range[0]} → {_up4.series.date_range[1]}"
                         )
                     with _ub4:
                         st.selectbox(
                             "Asignar source:",
-                            ["ðŸš« Descartar"] + _avail_src_names4,
+                            ["🚫 Descartar"] + _avail_src_names4,
                             key=f"manual_match_plat_{_ip4}_{_up4.series.name}",
                         )
             elif _auto_mr.matches:
-                st.success("Todas las series platform fueron matcheadas automÃ¡ticamente.")
+                st.success("Todas las series platform fueron matcheadas automáticamente.")
 
-            # â”€â”€ Unmatched platform (from auto) + additional sources â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            # ── Unmatched platform (from auto) + additional sources ───────────
             _addl_sources = st.session_state.get("additional_sources", [])
 
             if _unmatched_plat4:
@@ -1627,7 +1627,7 @@ with tab_compare:
                 if _matched_addl:
                     st.markdown(f"**Sources adicionales ya procesados ({len(_matched_addl)}):**")
                     for _ma in _matched_addl:
-                        st.caption(f"âœ… {_ma['filename']} â€” {len(_ma.get('selected_series', []))} series")
+                        st.caption(f"✅ {_ma['filename']} — {len(_ma.get('selected_series', []))} series")
 
                 st.markdown("---")
 
@@ -1637,10 +1637,10 @@ with tab_compare:
                 )
 
                 if _cur_as_idx is not None:
-                    # â”€â”€ Current additional source workflow â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                    # ── Current additional source workflow ────────────────────
                     _cur_as = _addl_sources[_cur_as_idx]
                     _akey = f"addl_{_cur_as_idx}"
-                    st.markdown(f"**ðŸ“ Source adicional {_cur_as_idx + 1}: `{_cur_as['filename']}`**")
+                    st.markdown(f"**📁 Source adicional {_cur_as_idx + 1}: `{_cur_as['filename']}`**")
 
                     if "column_classification" not in _cur_as:
                         # Classification step
@@ -1650,20 +1650,20 @@ with tab_compare:
                             _a_entity_col = st.selectbox(
                                 "Columna de entidades:", list(_adf.columns), key=f"{_akey}_entity"
                             )
-                            if st.button("âœ… Confirmar (Wide Transpuesto)", key=f"{_akey}_conf_trans"):
+                            if st.button("✅ Confirmar (Wide Transpuesto)", key=f"{_akey}_conf_trans"):
                                 _addl_sources[_cur_as_idx]["column_classification"] = {"entity_col": _a_entity_col}
                                 st.session_state["additional_sources"] = _addl_sources
                                 st.rerun()
                         else:
                             _a_auto_cls = _auto_classify_columns(_adf, _afmt)
                             _a_cls_opts = (
-                                ["Fecha", "AÃ±o", "Mes", "Trimestre", "DimensiÃ³n", "Valor", "Ignorar"] if _afmt == "long"
-                                else ["Fecha", "AÃ±o", "Mes", "Trimestre", "Serie", "Ignorar"]
+                                ["Fecha", "Año", "Mes", "Trimestre", "Dimensión", "Valor", "Ignorar"] if _afmt == "long"
+                                else ["Fecha", "Año", "Mes", "Trimestre", "Serie", "Ignorar"]
                             )
                             if _afmt == "long":
-                                st.caption("**Fecha** Â· **AÃ±o+Mes/Trimestre** Â· **DimensiÃ³n** Â· **Valor** Â· **Ignorar**")
+                                st.caption("**Fecha** · **Año+Mes/Trimestre** · **Dimensión** · **Valor** · **Ignorar**")
                             else:
-                                st.caption("**Fecha** Â· **AÃ±o+Mes/Trimestre** Â· **Serie** (columna numÃ©rica) Â· **Ignorar**")
+                                st.caption("**Fecha** · **Año+Mes/Trimestre** · **Serie** (columna numérica) · **Ignorar**")
                             _a_cls_rows = []
                             for _col in _adf.columns:
                                 _cur_t = _a_auto_cls.get(_col, _a_cls_opts[-1])
@@ -1672,14 +1672,14 @@ with tab_compare:
                                 _a_cls_rows.append({
                                     "Columna": _col,
                                     "Tipo detectado": _detect_column_type(_adf, _col),
-                                    "Tu clasificaciÃ³n": _cur_t,
+                                    "Tu clasificación": _cur_t,
                                 })
                             _a_cls_edited = st.data_editor(
                                 pd.DataFrame(_a_cls_rows),
                                 column_config={
                                     "Columna": st.column_config.TextColumn(disabled=True),
                                     "Tipo detectado": st.column_config.TextColumn(disabled=True),
-                                    "Tu clasificaciÃ³n": st.column_config.SelectboxColumn(
+                                    "Tu clasificación": st.column_config.SelectboxColumn(
                                         options=_a_cls_opts, required=True,
                                     ),
                                 },
@@ -1687,8 +1687,8 @@ with tab_compare:
                                 key=f"{_akey}_cls_editor",
                             )
                             # Date composition panel for additional source
-                            _aa_cls_dict = dict(zip(_a_cls_edited["Columna"], _a_cls_edited["Tu clasificaciÃ³n"]))
-                            _aa_year_col = next((c for c, t in _aa_cls_dict.items() if t == "AÃ±o"), None)
+                            _aa_cls_dict = dict(zip(_a_cls_edited["Columna"], _a_cls_edited["Tu clasificación"]))
+                            _aa_year_col = next((c for c, t in _aa_cls_dict.items() if t == "Año"), None)
                             _aa_period_col = next((c for c, t in _aa_cls_dict.items() if t in ("Mes", "Trimestre")), None)
                             _aa_period_kind = next((t for t in _aa_cls_dict.values() if t in ("Mes", "Trimestre")), None)
                             _aa_compose_valid = True
@@ -1699,19 +1699,19 @@ with tab_compare:
                                     f"{_akey}_compose"
                                 )
 
-                            _a_n_fecha = (_a_cls_edited["Tu clasificaciÃ³n"] == "Fecha").sum()
-                            _a_n_year = (_a_cls_edited["Tu clasificaciÃ³n"] == "AÃ±o").sum()
-                            _a_n_period = (_a_cls_edited["Tu clasificaciÃ³n"].isin(["Mes", "Trimestre"])).sum()
+                            _a_n_fecha = (_a_cls_edited["Tu clasificación"] == "Fecha").sum()
+                            _a_n_year = (_a_cls_edited["Tu clasificación"] == "Año").sum()
+                            _a_n_period = (_a_cls_edited["Tu clasificación"].isin(["Mes", "Trimestre"])).sum()
                             _a_has_date = _a_n_fecha >= 1 or (_a_n_year >= 1 and _a_n_period >= 1)
                             _a_val_label = "Valor" if _afmt == "long" else "Serie"
-                            _a_n_val = (_a_cls_edited["Tu clasificaciÃ³n"] == _a_val_label).sum()
+                            _a_n_val = (_a_cls_edited["Tu clasificación"] == _a_val_label).sum()
                             _a_can_conf = _a_has_date and _a_n_val > 0 and _aa_compose_valid
                             if not _a_can_conf:
-                                st.error("NecesitÃ¡s al menos 1 Fecha (o AÃ±o+Mes/Trimestre) y 1 columna Valor/Serie.")
-                            if st.button("âœ… Confirmar clasificaciÃ³n", key=f"{_akey}_conf_cls",
+                                st.error("Necesitás al menos 1 Fecha (o Año+Mes/Trimestre) y 1 columna Valor/Serie.")
+                            if st.button("✅ Confirmar clasificación", key=f"{_akey}_conf_cls",
                                          disabled=not _a_can_conf):
                                 _addl_sources[_cur_as_idx]["column_classification"] = dict(
-                                    zip(_a_cls_edited["Columna"], _a_cls_edited["Tu clasificaciÃ³n"])
+                                    zip(_a_cls_edited["Columna"], _a_cls_edited["Tu clasificación"])
                                 )
                                 _addl_sources[_cur_as_idx]["period_type"] = _aa_period_type
                                 st.session_state["additional_sources"] = _addl_sources
@@ -1719,8 +1719,8 @@ with tab_compare:
 
                     elif "extraction" not in _cur_as:
                         # Extraction step
-                        st.info("ClasificaciÃ³n confirmada. HacÃ© clic en 'Extraer series'.")
-                        if st.button("âš™ï¸ Extraer series", key=f"{_akey}_extract", type="primary"):
+                        st.info("Clasificación confirmada. Hacé clic en 'Extraer series'.")
+                        if st.button("⚙️ Extraer series", key=f"{_akey}_extract", type="primary"):
                             _adf = _cur_as["df"]
                             _afmt = _cur_as["format"]
                             _acls = _cur_as["column_classification"]
@@ -1729,7 +1729,7 @@ with tab_compare:
                                     _a_df_composed, _a_date = _apply_date_composition(
                                         _adf, _acls, _cur_as.get("period_type")
                                     )
-                                    _a_dims = [c for c, t in _acls.items() if t == "DimensiÃ³n"]
+                                    _a_dims = [c for c, t in _acls.items() if t == "Dimensión"]
                                     _a_val = next((c for c, t in _acls.items() if t == "Valor"), None)
                                     _a_ext_r = extract_series_long(_a_df_composed, _a_date, _a_dims, _a_val)
                                 elif _afmt == "wide":
@@ -1745,27 +1745,27 @@ with tab_compare:
                                 st.session_state["additional_sources"] = _addl_sources
                                 st.rerun()
                             except Exception as _ae:
-                                st.error(f"Error en extracciÃ³n: {_ae}")
+                                st.error(f"Error en extracción: {_ae}")
 
                     elif "selected_series" not in _cur_as:
                         # Series selection step
                         _a_ext_r = _cur_as["extraction"]
-                        st.markdown(f"Series extraÃ­das: **{_a_ext_r.total_series}**")
+                        st.markdown(f"Series extraídas: **{_a_ext_r.total_series}**")
                         _a_sel_checks: dict[str, bool] = {}
                         for _i, _s in enumerate(_a_ext_r.series):
                             _areason = _discard_reason(_s)
                             _adefault = _areason is None
                             _albl = f"{_s.name} ({_s.row_count} pts)"
                             if _areason:
-                                _albl += f" âš ï¸ {_areason}"
+                                _albl += f" ⚠️ {_areason}"
                             _ak = f"{_akey}_sel_{_i}_{_s.name}"
                             _a_sel_checks[_s.name] = st.checkbox(
                                 _albl, value=st.session_state.get(_ak, _adefault), key=_ak
                             )
                         _a_selected = [n for n, v in _a_sel_checks.items() if v]
                         if not _a_selected:
-                            st.warning("SeleccionÃ¡ al menos 1 serie.")
-                        if st.button("âœ… Confirmar series adicionales", key=f"{_akey}_conf_sel",
+                            st.warning("Seleccioná al menos 1 serie.")
+                        if st.button("✅ Confirmar series adicionales", key=f"{_akey}_conf_sel",
                                      disabled=not bool(_a_selected)):
                             _addl_sources[_cur_as_idx]["selected_series"] = _a_selected
                             st.session_state["additional_sources"] = _addl_sources
@@ -1797,7 +1797,7 @@ with tab_compare:
                             st.markdown(f"**Auto-matches encontrados: {_addl_auto_mr.matched_count}**")
                             _am_rows = [
                                 {
-                                    "": "âœ…" if _am.confidence >= 0.9 else "âš ï¸",
+                                    "": "✅" if _am.confidence >= 0.9 else "⚠️",
                                     "Serie Source Adicional": _am.source_series.name,
                                     "Serie Platform": _am.platform_series.name,
                                     "Confianza": f"{_am.confidence:.0%}",
@@ -1807,31 +1807,31 @@ with tab_compare:
                             st.dataframe(pd.DataFrame(_am_rows), hide_index=True,
                                          use_container_width=True)
                         else:
-                            st.info("No se encontraron matches automÃ¡ticos para este source adicional.")
+                            st.info("No se encontraron matches automáticos para este source adicional.")
 
                         _addl_unmatched_plat = _addl_auto_mr.unmatched_platform
                         _addl_avail_src = _addl_auto_mr.unmatched_source
-                        _addl_src_opts = ["ðŸš« Descartar"] + [u.series.name for u in _addl_avail_src]
+                        _addl_src_opts = ["🚫 Descartar"] + [u.series.name for u in _addl_avail_src]
 
                         if _addl_unmatched_plat:
                             st.markdown(f"**Sin match ({len(_addl_unmatched_plat)} series platform):**")
                             for _iap, _aup in enumerate(_addl_unmatched_plat):
                                 _aa, _ab = st.columns([2, 3])
                                 with _aa:
-                                    st.caption(f"âš ï¸ **{_aup.series.name}**")
+                                    st.caption(f"⚠️ **{_aup.series.name}**")
                                 with _ab:
                                     st.selectbox(
                                         "Asignar source adicional:", _addl_src_opts,
                                         key=f"addl_manual_{_cur_as_idx}_{_iap}_{_aup.series.name}",
                                     )
 
-                        if st.button("ðŸ”— Aplicar matches del source adicional",
+                        if st.button("🔗 Aplicar matches del source adicional",
                                      key=f"{_akey}_apply", type="primary"):
                             _addl_manual_pairs = []
                             for _iap, _aup in enumerate(_addl_unmatched_plat):
                                 _wk = f"addl_manual_{_cur_as_idx}_{_iap}_{_aup.series.name}"
-                                _s_sel = st.session_state.get(_wk, "ðŸš« Descartar")
-                                if _s_sel != "ðŸš« Descartar":
+                                _s_sel = st.session_state.get(_wk, "🚫 Descartar")
+                                if _s_sel != "🚫 Descartar":
                                     _addl_manual_pairs.append((_s_sel, _aup.series.name))
                             _addl_final_mr = apply_manual_matches(_addl_auto_mr, _addl_manual_pairs)
                             _merged_mr = _merge_matching_results(_auto_mr, _addl_final_mr)
@@ -1849,9 +1849,9 @@ with tab_compare:
                             st.rerun()
 
                 else:
-                    # No current unmatched source â†’ show upload form for a new one
+                    # No current unmatched source → show upload form for a new one
                     _new_idx = len(_addl_sources)
-                    st.markdown("**ðŸ“ Agregar otro source para las series restantes**")
+                    st.markdown("**📁 Agregar otro source para las series restantes**")
                     _a_fmt_radio = st.radio(
                         "Formato:", ["Long", "Wide", "Wide Transpuesto"],
                         horizontal=True, key=f"addl_fmt_{_new_idx}",
@@ -1874,7 +1874,7 @@ with tab_compare:
 
             st.markdown("---")
 
-            # â”€â”€ Confirm matching button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            # ── Confirm matching button ───────────────────────────────────────
             _n_kept4 = sum(
                 1 for _i4m in range(len(_auto_mr.matches))
                 if _edited_matches4.iloc[_i4m]["Incluir"]
@@ -1882,8 +1882,8 @@ with tab_compare:
             _n_manual_assigned4 = sum(
                 1 for _ip4, _up4 in enumerate(_all_unmatched_plat4)
                 if st.session_state.get(
-                    f"manual_match_plat_{_ip4}_{_up4.series.name}", "ðŸš« Descartar"
-                ) != "ðŸš« Descartar"
+                    f"manual_match_plat_{_ip4}_{_up4.series.name}", "🚫 Descartar"
+                ) != "🚫 Descartar"
             )
             _n_still_unmatched4 = len(_all_unmatched_plat4) - _n_manual_assigned4
             _has_any_match4 = _n_kept4 > 0 or _n_manual_assigned4 > 0
@@ -1894,17 +1894,17 @@ with tab_compare:
 
             if _n_still_unmatched4 > 0 and not _pending_discarded:
                 st.warning(
-                    f"âš ï¸ Quedan **{_n_still_unmatched4}** series Platform sin asignar. "
-                    "PodÃ©s agregar otro source arriba o descartarlas para continuar."
+                    f"⚠️ Quedan **{_n_still_unmatched4}** series Platform sin asignar. "
+                    "Podés agregar otro source arriba o descartarlas para continuar."
                 )
-                if st.button("ðŸš« Descartar todas las pendientes", key="discard_pending"):
+                if st.button("🚫 Descartar todas las pendientes", key="discard_pending"):
                     st.session_state["platform_pending_discarded"] = True
                     st.rerun()
 
             _btn4a, _btn4b = st.columns(2)
             with _btn4a:
                 if st.button(
-                    "âœ… Confirmar matching", key="confirm_matching",
+                    "✅ Confirmar matching", key="confirm_matching",
                     type="primary", disabled=not _can_confirm_matching,
                 ):
                     # Kept auto-matches
@@ -1917,14 +1917,14 @@ with tab_compare:
                     _manual_matches4: list[SeriesMatch] = []
                     for _ip4, _up4 in enumerate(_all_unmatched_plat4):
                         _wk4 = f"manual_match_plat_{_ip4}_{_up4.series.name}"
-                        _sel4 = st.session_state.get(_wk4, "ðŸš« Descartar")
-                        if _sel4 != "ðŸš« Descartar" and _sel4 in _avail_src_objs4:
+                        _sel4 = st.session_state.get(_wk4, "🚫 Descartar")
+                        if _sel4 != "🚫 Descartar" and _sel4 in _avail_src_objs4:
                             _manual_matches4.append(SeriesMatch(
                                 source_series=_avail_src_objs4[_sel4],
                                 platform_series=_up4.series,
                                 match_type="manual",
                                 confidence=1.0,
-                                similarity_details=f"Manual: '{_sel4}' â†’ '{_up4.series.name}'",
+                                similarity_details=f"Manual: '{_sel4}' → '{_up4.series.name}'",
                             ))
                     _all_final4 = _kept_matches4 + _manual_matches4
                     _used_src_f4 = {m.source_series.name for m in _all_final4}
@@ -1966,7 +1966,7 @@ with tab_compare:
                     st.session_state.pop("compare_result", None)
                     st.rerun()
             with _btn4b:
-                if st.button("ðŸ”„ Re-run auto-match", key="rerun_automatch"):
+                if st.button("🔄 Re-run auto-match", key="rerun_automatch"):
                     for _k4 in ["_auto_matching_result", "matching_result",
                                  "matching_confirmed", "compare_result",
                                  "additional_sources", "platform_pending_discarded",
@@ -1974,14 +1974,14 @@ with tab_compare:
                         st.session_state.pop(_k4, None)
                     st.rerun()
 
-    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ─────────────────────────────────────────────────────────────────────────
     # PASO 5: Comparar
-    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ─────────────────────────────────────────────────────────────────────────
     if _s4_done:
         _mr5 = st.session_state["matching_result"]
 
         with st.expander(
-            f"{_sicon(_s5_done, not _s5_done)} PASO 5: Comparar â€” "
+            f"{_sicon(_s5_done, not _s5_done)} PASO 5: Comparar — "
             f"{_mr5.matched_count} pares matcheados",
             expanded=not _s5_done,
         ):
@@ -1996,7 +1996,7 @@ with tab_compare:
             )
 
             if st.button(
-                "ðŸš€ Comparar series matcheadas", type="primary", key="run_series_compare",
+                "🚀 Comparar series matcheadas", type="primary", key="run_series_compare",
             ):
                 _cmp5_config = {
                     "tolerance": _tol_rel5 / 100,
@@ -2012,12 +2012,12 @@ with tab_compare:
                         _s5_done = True
                         st.rerun()
                     except Exception as _e5:
-                        st.error(f"Error durante la comparaciÃ³n: {_e5}")
+                        st.error(f"Error durante la comparación: {_e5}")
                         st.exception(_e5)
 
-    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ─────────────────────────────────────────────────────────────────────────
     # PASO 6: Resultados
-    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ─────────────────────────────────────────────────────────────────────────
     if _s5_done:
         _diff6 = st.session_state["compare_result"]
         _tol6 = _diff6.config_used.get("tolerance", 0.01)
@@ -2025,7 +2025,7 @@ with tab_compare:
         _ps6 = _diff6.per_series_results or []
         _pct6 = _diff6.match_pct * 100
 
-        with st.expander("âœ… PASO 6: Resultados", expanded=True):
+        with st.expander("✅ PASO 6: Resultados", expanded=True):
             # Header
             _hc6a, _hc6b = st.columns([3, 1])
             with _hc6a:
@@ -2034,7 +2034,7 @@ with tab_compare:
                     _ac_id6 = st.session_state.get("alphacast_dataset_id")
                     _ac_nm6 = st.session_state.get("alphacast_dataset_name")
                     if _ac_id6 and _ac_nm6:
-                        _plat_label6 = f"Alphacast #{_ac_id6} â€” {_ac_nm6}"
+                        _plat_label6 = f"Alphacast #{_ac_id6} — {_ac_nm6}"
                 st.markdown(f"### {_diff6.source_name} vs {_plat_label6}")
             with _hc6b:
                 if _pct6 >= 95:
@@ -2057,11 +2057,11 @@ with tab_compare:
 
             # Sub-tabs
             _rt_sum, _rt_missing, _rt_diffs, _rt_plots, _rt_disc, _rt_export = st.tabs([
-                "ðŸ“Š Resumen", "ðŸ“‹ Missing/Extra", "ðŸ“Š Diffs por Serie",
-                "ðŸ“ˆ Plots", "ðŸ“‹ Descartadas", "ðŸ“„ Export",
+                "📊 Resumen", "📋 Missing/Extra", "📊 Diffs por Serie",
+                "📈 Plots", "📋 Descartadas", "📄 Export",
             ])
 
-            # â”€â”€ Resumen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            # ── Resumen ───────────────────────────────────────────────────────
             with _rt_sum:
                 st.progress(min(_diff6.match_pct, 1.0))
                 st.markdown("")
@@ -2075,10 +2075,10 @@ with tab_compare:
                         _sd6 = _r6.get("scale_detection") or {}
                         _scale_flag = ""
                         if _sd6.get("confidence") in ("high", "medium") and _sd6.get("scale_factor", 1.0) != 1.0:
-                            _scale_flag = " âš ï¸ escala"
+                            _scale_flag = " ⚠️ escala"
                         _ps_rows6.append({
                             "Serie Source": _r6["source_name"],
-                            "Archivo Source": _file_map6.get(_r6["source_name"], "â€”"),
+                            "Archivo Source": _file_map6.get(_r6["source_name"], "—"),
                             "Serie Platform": _r6["platform_name"],
                             "Match %": round(_mp6 * 100, 1) if _mp6 is not None else None,
                             "Puntos": _r6.get("comparable_rows", 0),
@@ -2110,14 +2110,14 @@ with tab_compare:
                         )
 
                 if _ss6:
-                    with st.expander("â„¹ï¸ Detalles del matching"):
+                    with st.expander("ℹ️ Detalles del matching"):
                         _ms6 = {
                             k: v for k, v in _ss6.items()
                             if k not in ("matching_summary",)
                         }
                         st.json(_ms6)
 
-            # â”€â”€ Missing / Extra â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            # ── Missing / Extra ───────────────────────────────────────────────
             with _rt_missing:
                 _um_src6 = _ss6.get("unmatched_source_series", [])
                 _um_plat6 = _ss6.get("unmatched_platform_series", [])
@@ -2141,7 +2141,7 @@ with tab_compare:
                     else:
                         st.success("Todas matcheadas")
 
-            # â”€â”€ Diffs por Serie â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            # ── Diffs por Serie ───────────────────────────────────────────────
             with _rt_diffs:
                 if _diff6.all_diffs is None or len(_diff6.all_diffs) == 0:
                     st.success("Todos los valores coinciden dentro de la tolerancia.")
@@ -2182,7 +2182,7 @@ with tab_compare:
                         },
                     )
 
-            # â”€â”€ Plots â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            # ── Plots ─────────────────────────────────────────────────────────
             with _rt_plots:
                 try:
                     import plotly.graph_objects as go
@@ -2191,14 +2191,14 @@ with tab_compare:
                     _plotly_ok6 = False
 
                 if not _plotly_ok6:
-                    st.warning("InstalÃ¡ plotly: `pip install plotly`")
+                    st.warning("Instalá plotly: `pip install plotly`")
                 else:
                     _mr6_plot = st.session_state.get("matching_result")
                     if not _mr6_plot or not _mr6_plot.matches:
                         st.info("Sin datos de series para graficar.")
                     else:
                         _plot_opts6 = [
-                            f"{_m6p.source_series.name} â†’ {_m6p.platform_series.name}"
+                            f"{_m6p.source_series.name} → {_m6p.platform_series.name}"
                             for _m6p in _mr6_plot.matches
                         ]
                         _plot_sel6 = st.selectbox(
@@ -2281,12 +2281,12 @@ with tab_compare:
                                     annotation_text=f"tolerancia {_tol6 * 100:.1f}%",
                                 )
                                 _bfig6.update_layout(
-                                    title=f"Diferencia relativa % â€” {_src_s6.name}",
+                                    title=f"Diferencia relativa % — {_src_s6.name}",
                                     height=280, plot_bgcolor="white", paper_bgcolor="white",
                                 )
                                 st.plotly_chart(_bfig6, use_container_width=True)
 
-            # â”€â”€ Descartadas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            # ── Descartadas ───────────────────────────────────────────────────
             with _rt_disc:
                 _mr6d = st.session_state.get("matching_result")
                 if _mr6d:
@@ -2316,13 +2316,13 @@ with tab_compare:
                             hide_index=True, use_container_width=True,
                         )
 
-            # â”€â”€ Export â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            # ── Export ────────────────────────────────────────────────────────
             with _rt_export:
                 _d_exp6 = _diff6.to_serializable_dict()
 
                 _ec1, _ec2, _ec3 = st.columns(3)
                 with _ec1:
-                    if st.button("ðŸ’¾ Export JSON", key="export_json_s6"):
+                    if st.button("💾 Export JSON", key="export_json_s6"):
                         _rdir6 = Path(__file__).parent / "reports"
                         _rdir6.mkdir(exist_ok=True)
                         _ts6 = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
@@ -2332,7 +2332,7 @@ with tab_compare:
                         st.success(f"Guardado: `{_jp6.name}`")
 
                 with _ec2:
-                    if st.button("ðŸ“„ Export HTML", key="export_html_s6"):
+                    if st.button("📄 Export HTML", key="export_html_s6"):
                         _rdir6b = Path(__file__).parent / "reports"
                         _rdir6b.mkdir(exist_ok=True)
                         _ts6b = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
@@ -2342,7 +2342,7 @@ with tab_compare:
                         st.success(f"Guardado: `{_hp6.name}`")
 
                 with _ec3:
-                    if st.button("ðŸ’¾ Config matching YAML", key="export_matching_yaml_s6"):
+                    if st.button("💾 Config matching YAML", key="export_matching_yaml_s6"):
                         _mr6e = st.session_state.get("matching_result")
                         if _mr6e:
                             _ms6e = get_matching_summary(_mr6e)
@@ -2368,7 +2368,7 @@ with tab_compare:
                 st.markdown("---")
                 _json_str6 = json.dumps(_d_exp6, indent=2, ensure_ascii=False, default=str)
                 st.download_button(
-                    "â¬‡ Descargar JSON",
+                    "⬇ Descargar JSON",
                     data=_json_str6.encode("utf-8"),
                     file_name=f"compare_series_{datetime.now().strftime('%Y%m%dT%H%M%S')}.json",
                     mime="application/json",
@@ -2378,7 +2378,7 @@ with tab_compare:
 
         # Reset button
         st.markdown("---")
-    if st.button("ðŸ” Reiniciar comparaciÃ³n", key="reset_compare"):
+    if st.button("🔁 Reiniciar comparación", key="reset_compare"):
             for _kr in ["source_df", "platform_df", "source_format", "platform_format",
                         "classification_confirmed", "source_column_classification",
                         "platform_classification_confirmed", "platform_column_classification",
@@ -2400,13 +2400,13 @@ with tab_compare:
 
     elif not _s1_done:
         st.info(
-            "**Para comenzar:** CargÃ¡ los datasets Source y Platform en el **Paso 1** de arriba.",
+            "**Para comenzar:** Cargá los datasets Source y Platform en el **Paso 1** de arriba.",
         )
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-# TAB 2 â€” AUDIT
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ═════════════════════════════════════════════════════════════════════════════
+# TAB 2 — AUDIT
+# ═════════════════════════════════════════════════════════════════════════════
 with tab_audit:
     _audit_mode_tab = st.radio(
         "Auditar:",
@@ -2417,21 +2417,21 @@ with tab_audit:
     )
 
     if "audit_result" not in st.session_state:
-        st.markdown("## ðŸ” AuditorÃ­a de Dataset")
+        st.markdown("## 🔍 Auditoría de Dataset")
         if _audit_mode_tab in ("Source", "Platform"):
             _label = "Source" if _audit_mode_tab == "Source" else "Platform"
             st.info(
-                f"ConfigurÃ¡ la auditorÃ­a en el panel izquierdo "
-                f"(modo **{_label}** seleccionado) y hacÃ© clic en **â–¶ Run Audit**.",
+                f"Configurá la auditoría en el panel izquierdo "
+                f"(modo **{_label}** seleccionado) y hacé clic en **▶ Run Audit**.",
             )
         else:
-            st.info("SubÃ­ un dataset en el panel izquierdo y hacÃ© clic en **â–¶ Run Audit**.")
+            st.info("Subí un dataset en el panel izquierdo y hacé clic en **▶ Run Audit**.")
     else:
         report = st.session_state["audit_result"]
 
         col_title, col_badge = st.columns([3, 1])
         with col_title:
-            st.markdown(f"## AuditorÃ­a: `{report.dataset_name}`")
+            st.markdown(f"## Auditoría: `{report.dataset_name}`")
         with col_badge:
             if report.blockers > 0:
                 st.error("FAILED")
@@ -2475,9 +2475,9 @@ with tab_audit:
                         st.markdown(
                             f"""<div class="check-card {css_cls}">
                             <span class="{severity_badge_class(chk.severity)}">{chk.severity}</span>
-                            &nbsp;<strong>{chk.check_id}</strong> â€” {chk.check_name.replace('_', ' ').title()}<br>
+                            &nbsp;<strong>{chk.check_id}</strong> — {chk.check_name.replace('_', ' ').title()}<br>
                             <span style="font-size:0.9rem">{chk.message}</span>
-                            {"<br><span style='font-size:0.82rem;color:#6b7280'>ðŸ’¡ " + chk.recommendation + "</span>" if chk.recommendation else ""}
+                            {"<br><span style='font-size:0.82rem;color:#6b7280'>💡 " + chk.recommendation + "</span>" if chk.recommendation else ""}
                             </div>""",
                             unsafe_allow_html=True,
                         )
@@ -2525,18 +2525,18 @@ with tab_audit:
             st.json(report_dict, expanded=False)
             st.code(json_str, language="json")
             st.download_button(
-                "â¬‡ Descargar JSON", data=json_str.encode("utf-8"),
+                "⬇ Descargar JSON", data=json_str.encode("utf-8"),
                 file_name=f"{report.dataset_name}_{datetime.now().strftime('%Y%m%dT%H%M%S')}.json",
                 mime="application/json",
             )
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-# TAB 3 â€” SETTINGS
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ═════════════════════════════════════════════════════════════════════════════
+# TAB 3 — SETTINGS
+# ═════════════════════════════════════════════════════════════════════════════
 with tab_settings:
-    st.markdown("## âš™ï¸ ConfiguraciÃ³n")
-    st.markdown("**VersiÃ³n:** Dataset Auditor v2.0 â€” Series Compare + Audit")
+    st.markdown("## ⚙️ Configuración")
+    st.markdown("**Versión:** Dataset Auditor v2.0 — Series Compare + Audit")
 
     _base = Path(__file__).parent
     _reports_dir = _base / "reports"
@@ -2546,18 +2546,18 @@ with tab_settings:
     st.markdown("**Carpetas**")
     _s1, _s2 = st.columns(2)
     with _s1:
-        st.markdown(f"ðŸ“ **Reportes:** `{_reports_dir}`")
-        if st.button("ðŸ“‚ Abrir carpeta reportes", key="settings_open_reports"):
+        st.markdown(f"📁 **Reportes:** `{_reports_dir}`")
+        if st.button("📂 Abrir carpeta reportes", key="settings_open_reports"):
             _reports_dir.mkdir(exist_ok=True)
             reveal_directory(_reports_dir)
     with _s2:
-        st.markdown(f"ðŸ“ **Configs:** `{_configs_dir}`")
-        if st.button("ðŸ“‚ Abrir carpeta configs", key="settings_open_configs"):
+        st.markdown(f"📁 **Configs:** `{_configs_dir}`")
+        if st.button("📂 Abrir carpeta configs", key="settings_open_configs"):
             _configs_dir.mkdir(exist_ok=True)
             reveal_directory(_configs_dir)
 
     st.markdown("---")
-    st.markdown("**ðŸ”‘ Alphacast API**")
+    st.markdown("**🔑 Alphacast API**")
     _set_ac_key = st.session_state.get("alphacast_api_key")
     _set_ac_source = st.session_state.get("alphacast_api_key_source")
     _set_show_input = st.session_state.get("_set_ac_show_input", False)
@@ -2610,7 +2610,7 @@ with tab_settings:
                 st.warning("Ingresa una API key.")
 
     st.markdown("---")
-    if st.button("ðŸ—‘ï¸ Limpiar datos de sesiÃ³n", key="settings_clear_session"):
+    if st.button("🗑️ Limpiar datos de sesión", key="settings_clear_session"):
         for _k in [
             "source_df", "platform_df", "source_format",
             "classification_confirmed", "source_column_classification",
@@ -2626,16 +2626,16 @@ with tab_settings:
             "alphacast_api_key_source",
         ]:
             st.session_state.pop(_k, None)
-        st.success("SesiÃ³n limpiada.")
+        st.success("Sesión limpiada.")
         st.rerun()
 
     st.markdown("---")
-    st.markdown("**â„¹ï¸ Archivos demo disponibles en `demo/`**")
+    st.markdown("**ℹ️ Archivos demo disponibles en `demo/`**")
     _demo_files = [
-        ("demo_series_source_wide.csv", "Dataset fuente Wide (10 series econÃ³micas, 24 meses)"),
+        ("demo_series_source_wide.csv", "Dataset fuente Wide (10 series económicas, 24 meses)"),
         ("demo_series_platform_long.csv", "Dataset plataforma Long Alphacast (10 series, diffs intencionales)"),
-        ("demo_source.csv", "Dataset fuente para Compare clÃ¡sico"),
-        ("demo_platform.csv", "Dataset plataforma para Compare clÃ¡sico"),
+        ("demo_source.csv", "Dataset fuente para Compare clásico"),
+        ("demo_platform.csv", "Dataset plataforma para Compare clásico"),
         ("demo_data_clean.csv", "Dataset limpio para Audit"),
         ("demo_data_dirty.csv", "Dataset con errores para Audit"),
         ("demo_config.yaml", "Config YAML para Audit"),
@@ -2648,16 +2648,16 @@ with tab_settings:
     st.markdown("---")
     st.markdown("""
 **Flujo Compare por Series:**
-1. **Paso 1** â€” SubÃ­ Source (seleccionÃ¡ formato: Long/Wide/Wide Transpuesto) y Platform
-2. **Paso 2** â€” ClasificÃ¡ las columnas del Source (Fecha/Valor/DimensiÃ³n/Serie/Ignorar)
-3. **Paso 3** â€” ExtracciÃ³n automÃ¡tica de series individuales
-4. **Paso 4** â€” Matching automÃ¡tico + resoluciÃ³n manual de los sin match
-5. **Paso 5** â€” ConfigurÃ¡ tolerancias y ejecutÃ¡ la comparaciÃ³n
-6. **Paso 6** â€” Resultados: KPIs, tabla por serie, plots, export
+1. **Paso 1** — Subí Source (seleccioná formato: Long/Wide/Wide Transpuesto) y Platform
+2. **Paso 2** — Clasificá las columnas del Source (Fecha/Valor/Dimensión/Serie/Ignorar)
+3. **Paso 3** — Extracción automática de series individuales
+4. **Paso 4** — Matching automático + resolución manual de los sin match
+5. **Paso 5** — Configurá tolerancias y ejecutá la comparación
+6. **Paso 6** — Resultados: KPIs, tabla por serie, plots, export
 """)
 
 
-# â”€â”€ Footer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Footer ────────────────────────────────────────────────────────────────────
 _ts_parts = []
 if "compare_ts" in st.session_state:
     _ts_parts.append(f"Compare: {st.session_state['compare_ts']}")
@@ -2665,9 +2665,10 @@ if "audit_ts" in st.session_state:
     _ts_parts.append(f"Audit: {st.session_state['audit_ts']}")
 if _ts_parts:
     st.markdown(
-        f"<div class='footer'>{' &nbsp;Â·&nbsp; '.join(_ts_parts)}</div>",
+        f"<div class='footer'>{' &nbsp;·&nbsp; '.join(_ts_parts)}</div>",
         unsafe_allow_html=True,
     )
+
 
 
 
