@@ -46,7 +46,6 @@ from src.series_matcher import (
 # â”€â”€ Page config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 st.set_page_config(
     page_title="Dataset Auditor",
-    page_icon="ðŸ”",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -747,10 +746,11 @@ if run_audit_btn and can_audit:
             st.session_state["audit_config"] = config_loaded.copy()
             st.session_state["audit_ts"] = datetime.now(timezone.utc).isoformat()
             save_snapshot(df_audit_loaded, config_loaded["dataset_name"])
-            st.toast("Snapshot guardado.", icon="ðŸ’¾")
+            st.toast("Snapshot guardado.")
         except Exception as exc:
             st.error(f"Error durante la auditorÃ­a: {exc}")
-            st.exception(exc)
+            if os.getenv("DEBUG"):
+                st.exception(exc)
 
 # â”€â”€ Export audit report â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if export_clicked and "audit_result" in st.session_state:
@@ -2038,11 +2038,11 @@ with tab_compare:
                 st.markdown(f"### {_diff6.source_name} vs {_plat_label6}")
             with _hc6b:
                 if _pct6 >= 95:
-                    st.success(f"{_pct6:.1f}% match", icon="âœ…")
+                    st.success(f"{_pct6:.1f}% match")
                 elif _pct6 >= 80:
-                    st.warning(f"{_pct6:.1f}% match", icon="âš ï¸")
+                    st.warning(f"{_pct6:.1f}% match")
                 else:
-                    st.error(f"{_pct6:.1f}% match", icon="ðŸ”´")
+                    st.error(f"{_pct6:.1f}% match")
 
             # KPIs
             _mr6 = st.session_state.get("matching_result")
@@ -2107,7 +2107,6 @@ with tab_compare:
                                 f"(confianza: {(_r6['scale_detection'] or {}).get('confidence', '?')})"
                                 for _r6 in _scale_warns6
                             ),
-                            icon="âš ï¸",
                         )
 
                 if _ss6:
@@ -2145,7 +2144,7 @@ with tab_compare:
             # â”€â”€ Diffs por Serie â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             with _rt_diffs:
                 if _diff6.all_diffs is None or len(_diff6.all_diffs) == 0:
-                    st.success("Todos los valores coinciden dentro de la tolerancia.", icon="âœ…")
+                    st.success("Todos los valores coinciden dentro de la tolerancia.")
                 else:
                     _mg6 = _diff6.all_diffs.copy()
                     _series_keys6 = sorted(_mg6["Key"].unique().tolist())
@@ -2402,7 +2401,6 @@ with tab_compare:
     elif not _s1_done:
         st.info(
             "**Para comenzar:** CargÃ¡ los datasets Source y Platform en el **Paso 1** de arriba.",
-            icon="ðŸ‘†",
         )
 
 
@@ -2425,10 +2423,9 @@ with tab_audit:
             st.info(
                 f"ConfigurÃ¡ la auditorÃ­a en el panel izquierdo "
                 f"(modo **{_label}** seleccionado) y hacÃ© clic en **â–¶ Run Audit**.",
-                icon="ðŸ‘ˆ",
             )
         else:
-            st.info("SubÃ­ un dataset en el panel izquierdo y hacÃ© clic en **â–¶ Run Audit**.", icon="ðŸ‘ˆ")
+            st.info("SubÃ­ un dataset en el panel izquierdo y hacÃ© clic en **â–¶ Run Audit**.")
     else:
         report = st.session_state["audit_result"]
 
@@ -2437,11 +2434,11 @@ with tab_audit:
             st.markdown(f"## AuditorÃ­a: `{report.dataset_name}`")
         with col_badge:
             if report.blockers > 0:
-                st.error("FAILED", icon="ðŸ”´")
+                st.error("FAILED")
             elif report.warnings > 0:
-                st.warning("WARNINGS", icon="âš ï¸")
+                st.warning("WARNINGS")
             else:
-                st.success("PASSED", icon="âœ…")
+                st.success("PASSED")
         st.caption(report.summary)
 
         m1, m2, m3, m4, m5 = st.columns(5)
@@ -2464,7 +2461,7 @@ with tab_audit:
 
             failed_checks = [c for c in report.checks if not c.passed]
             if not failed_checks:
-                st.success("Todos los checks pasaron.", icon="âœ…")
+                st.success("Todos los checks pasaron.")
             else:
                 sev_order = {"BLOCKER": 0, "WARNING": 1, "INFO": 2}
                 failed_checks = sorted(failed_checks, key=lambda c: sev_order.get(c.severity, 9))
@@ -2671,6 +2668,8 @@ if _ts_parts:
         f"<div class='footer'>{' &nbsp;Â·&nbsp; '.join(_ts_parts)}</div>",
         unsafe_allow_html=True,
     )
+
+
 
 
 
