@@ -43,6 +43,7 @@ Automatic data quality auditing app with a Streamlit UI and CLI entrypoint.
 - Added support for campaign-style proxy dates in detection and parsing: `YYYY/YYYY`, `YYYY-YYYY`, and `YYYY/YY`, mapped to `YYYY-01-01`.
 - Fixed Step 1 so the UI reruns immediately after uploading Source or Platform files, avoiding the need for a manual extra interaction to reach Step 2.
 - Added support for long-format datasets with multiple value columns by melting them into a metric dimension and extracting separate series per metric.
+- Updated Step 4 auto-matching so unmatched platform series can now fall back to name matching even when there is temporal overlap but correlation is weak or insufficient.
 - Kept local behavior intact after deploy-related changes.
 - `app.py` only shows `st.exception(exc)` when `DEBUG` is set in the environment.
 - Removed the leftover debug `print()` from `src/auto_detect.py`.

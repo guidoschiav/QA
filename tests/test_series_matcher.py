@@ -134,7 +134,7 @@ class TestCorrelationMatch:
         assert result.matched_count == 0
 
     def test_below_085_candidate_threshold_unmatched(self):
-        """Source with overlap but r < 0.85 stays unmatched (no name fallback for overlapping)."""
+        """Source with overlap but weak correlation can still fall back to name matching."""
         n = 20
         # Slightly correlated but not enough (add noise to drop r below 0.85)
         rng = np.random.default_rng(42)
@@ -155,9 +155,12 @@ class TestCorrelationMatch:
         src = _make_extraction([src_s])
         plat = _make_extraction([plat_s])
         r = auto_match_series(src, plat, correlation_threshold=0.95)
-        # If r happens to be >= 0.85, match is ok; otherwise must be unmatched (no name fallback)
-        if r.matched_count == 0:
-            assert len(r.unmatched_source) == 1
+        if r.matches and r.matches[0].match_type == "correlation":
+            assert r.matched_count == 1
+        else:
+            assert r.matched_count == 1
+            assert r.matches[0].match_type == "name_only"
+            assert "correl" in r.matches[0].similarity_details.lower()
 
     def test_correlation_details_includes_r_value(self):
         src = _make_extraction([_make_series("X", offset=100.0)])
@@ -299,8 +302,8 @@ class TestCascadePriority:
         assert result.matched_count == 1
         assert len(result.unmatched_source) == 1
 
-    def test_overlapping_bad_correlation_no_name_fallback(self):
-        """Source with overlap but bad correlation is left UNMATCHED (not name-fallback)."""
+    def test_overlapping_bad_correlation_falls_back_to_name(self):
+        """Source with overlap but bad correlation now falls back to name matching."""
         n = 12
         dates = pd.date_range("2023-01-01", periods=n, freq="MS")
         src_s = Series(
@@ -316,8 +319,10 @@ class TestCascadePriority:
         src = _make_extraction([src_s])
         plat = _make_extraction([plat_s])
         result = auto_match_series(src, plat, correlation_threshold=0.95)
-        # r = -1, has overlap → NOT matched even though names are identical
-        assert result.matched_count == 0
+        # r = -1, has overlap → correlation fails, but exact name should rescue the match
+        assert result.matched_count == 1
+        assert result.matches[0].match_type == "name_only"
+        assert "correl" in result.matches[0].similarity_details.lower()
 
     def test_greedy_order_highest_r_first(self):
         """Source with best correlation is processed first in greedy phase."""

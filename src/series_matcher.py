@@ -129,13 +129,13 @@ def auto_match_series(
             tiebreak by name similarity boost, match_type="correlation"
         - best r < 0.85 for all sources: no correlation match → see Phase 2
 
-    Phase 2 — Name-only fallback (for platform with NO date overlap at all)
-        If a platform series has zero overlapping dates with every source series,
-        try name matching: exact → normalized → substring.
+    Phase 2 â€” Name-only fallback (for any still-unmatched platform series)
+        If a platform series remains unmatched after the correlation phase,
+        try name matching: exact â†’ normalized â†’ substring.
         match_type = "name_only"
 
-    Platform series that have overlapping data but poor correlation are left
-    UNMATCHED (no name fallback — data evidence is stronger than name similarity).
+    This keeps correlation as the primary signal, but still allows intuitive
+    name-based pairing when correlations are weak or unavailable.
     Source series not used by any platform remain in unmatched_source (pool leftover).
     """
     log: list[str] = []
@@ -236,20 +236,22 @@ def auto_match_series(
 
     log.append(f"Correlation phase matched: {len(matches)}")
 
-    # ── Phase 2: Name-only fallback (platform with no date overlap) ────────────
+    # â”€â”€ Phase 2: Name-only fallback for remaining unmatched platform series â”€â”€
     src_lower_list = [s.name.strip().lower() for s in src_series]
     src_norm_list = [_norm(s.name) for s in src_series]
 
     for pi, plat in enumerate(plat_series):
         if pi in used_plat:
             continue
-        if has_any_overlap_plat[pi]:
-            # Had overlapping dates but correlation was insufficient → leave unmatched
-            continue
 
         plat_lower = plat.name.strip().lower()
         plat_n = _norm(plat.name)
         matched = False
+        overlap_note = (
+            " (con overlap pero correlación insuficiente)"
+            if has_any_overlap_plat[pi]
+            else " (sin datos comparables)"
+        )
 
         # a. Exact
         for si in range(len(src_series)):
@@ -258,7 +260,7 @@ def auto_match_series(
             if plat_lower == src_lower_list[si]:
                 src = src_series[si]
                 conf = 1.0 if plat.name == src.name else 0.98
-                detail = "name_only: exact match (sin datos comparables)"
+                detail = f"name_only: exact match{overlap_note}"
                 matches.append(SeriesMatch(src, plat, "name_only", conf, detail))
                 log.append(f"[name-exact] '{plat.name}' ← '{src.name}'")
                 used_src.add(si)
@@ -274,7 +276,7 @@ def auto_match_series(
                 continue
             if plat_n and plat_n == src_norm_list[si]:
                 src = src_series[si]
-                detail = "name_only: normalized match (sin datos comparables)"
+                detail = f"name_only: normalized match{overlap_note}"
                 matches.append(SeriesMatch(src, plat, "name_only", 0.50, detail))
                 log.append(f"[name-norm] '{plat.name}' ← '{src.name}'")
                 used_src.add(si)
@@ -298,7 +300,7 @@ def auto_match_series(
                     best_si_fb = si
         if best_si_fb is not None:
             src = src_series[best_si_fb]
-            detail = "name_only: substring match (sin datos comparables)"
+            detail = f"name_only: substring match{overlap_note}"
             matches.append(SeriesMatch(src, plat, "name_only", 0.40, detail))
             log.append(f"[name-substr] '{plat.name}' ← '{src.name}'")
             used_src.add(best_si_fb)
