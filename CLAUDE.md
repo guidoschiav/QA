@@ -40,6 +40,7 @@ Automatic data quality auditing app with a Streamlit UI and CLI entrypoint.
 - Replaced folder-opening behavior with a Cloud-safe fallback through `reveal_directory(...)` so the app does not fail on Streamlit Cloud.
 - Removed broken `icon=` parameters that were crashing Streamlit Cloud when mojibake emojis were present.
 - Fixed the text encoding of `app.py` so labels and Spanish text render correctly in Cloud.
+- Added support for campaign-style proxy dates in detection and parsing: `YYYY/YYYY`, `YYYY-YYYY`, and `YYYY/YY`, mapped to `YYYY-01-01`.
 - Kept local behavior intact after deploy-related changes.
 - `app.py` only shows `st.exception(exc)` when `DEBUG` is set in the environment.
 - Removed the leftover debug `print()` from `src/auto_detect.py`.

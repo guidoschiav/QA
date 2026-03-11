@@ -36,6 +36,8 @@ _RE_MONTH_ES = re.compile(
     re.I,
 )
 
+_RE_CAMPAIGN_YEAR_SPAN = re.compile(r"^(\d{4})(?:[/-])(\d{2}|\d{4})$")
+
 
 def _replace_nulls(series: pd.Series) -> pd.Series:
     """Replace known null strings with NaN."""
@@ -83,6 +85,26 @@ def _parse_month_es(series: pd.Series) -> pd.Series:
     return pd.Series(result, dtype="datetime64[ns]", index=series.index)
 
 
+def _parse_campaign_year_span(series: pd.Series) -> pd.Series:
+    """Parse campaign strings like 2025/2026, 2025-2026, 2025/26 to YYYY-01-01."""
+    result = []
+    for val in series:
+        ts = pd.NaT
+        s = str(val).strip() if pd.notna(val) and val is not None else ""
+        m = _RE_CAMPAIGN_YEAR_SPAN.match(s)
+        if m:
+            start_year = int(m.group(1))
+            end_part = m.group(2)
+            end_year = ((start_year // 100) * 100 + int(end_part)) if len(end_part) == 2 else int(end_part)
+            if end_year == start_year + 1:
+                try:
+                    ts = pd.Timestamp(year=start_year, month=1, day=1)
+                except Exception:
+                    pass
+        result.append(ts)
+    return pd.Series(result, dtype="datetime64[ns]", index=series.index)
+
+
 def _parse_dates(series: pd.Series) -> pd.Series:
     """Parse a series of values to datetime64 using detect_date_format hints."""
     if pd.api.types.is_datetime64_any_dtype(series):
@@ -102,6 +124,8 @@ def _parse_dates(series: pd.Series) -> pd.Series:
         return pd.to_datetime(s, errors="coerce")
     elif fmt_name == "dmy":
         return pd.to_datetime(s, errors="coerce", dayfirst=True)
+    elif fmt_name == "campaign_year_span":
+        return _parse_campaign_year_span(s.astype(str).str.strip())
     elif fmt_name == "year_only":
         return pd.to_datetime(
             s.astype(str).str.strip().replace("nan", np.nan).fillna("") + "-01-01",

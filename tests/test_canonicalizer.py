@@ -1,4 +1,4 @@
-"""Tests for src/canonicalizer.py"""
+﻿"""Tests for src/canonicalizer.py"""
 import pandas as pd
 import numpy as np
 import pytest
@@ -32,9 +32,9 @@ def make_wide_df():
     })
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Original tests — unchanged
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# Original tests â€” unchanged
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class TestLongFormat:
     def test_basic_long(self):
@@ -93,7 +93,7 @@ class TestWideFormat:
         result = canonicalize(df, date_col="Date", key_cols=[], value_col=None,
                                value_cols=["CABA", "GBA", "Interior"], fmt="wide")
         assert list(result.df.columns) == ["Date", "Key", "Value"]
-        assert len(result.df) == 6  # 2 dates × 3 cols
+        assert len(result.df) == 6  # 2 dates Ã— 3 cols
         assert result.format_original == "wide"
 
     def test_wide_key_contains_col_name(self):
@@ -129,13 +129,13 @@ class TestValueParsing:
         assert abs(result.df.iloc[0]["Value"] - 100.5) < 1e-9
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# New tests — header detection
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# New tests â€” header detection
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class TestDetectHeaderRow:
     def test_junk_rows_at_top(self):
-        """3 junk rows + 1 header row → detect header at index 3."""
+        """3 junk rows + 1 header row â†’ detect header at index 3."""
         df_raw = pd.DataFrame([
             ["Report Q1-2025", None, None, None],       # row 0: junk (1 string)
             ["Source: Government", None, None, None],   # row 1: junk (1 string)
@@ -147,7 +147,7 @@ class TestDetectHeaderRow:
         assert detect_header_row(df_raw) == 3
 
     def test_already_loaded_returns_zero(self):
-        """DataFrame with string column names → returns 0 (header already applied)."""
+        """DataFrame with string column names â†’ returns 0 (header already applied)."""
         df = make_long_df()
         assert detect_header_row(df) == 0
 
@@ -179,13 +179,13 @@ class TestDetectHeaderRow:
         assert any("Header detected" in l for l in result.normalization_log)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# New tests — date format detection & parsing
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# New tests â€” date format detection & parsing
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class TestDateFormats:
     def test_dmy_slash(self):
-        """DD/MM/YYYY → parsed as 2025-03-15."""
+        """DD/MM/YYYY â†’ parsed as 2025-03-15."""
         df = pd.DataFrame({
             "Date": ["15/03/2025", "20/03/2025"],
             "Value": [100.0, 200.0],
@@ -202,7 +202,7 @@ class TestDateFormats:
         assert info["format"] == "dmy"
 
     def test_spanish_month_text(self):
-        """'Ene 2025' → 2025-01-01."""
+        """'Ene 2025' â†’ 2025-01-01."""
         df = pd.DataFrame({
             "Date": ["Ene 2025", "Feb 2025", "Mar 2025"],
             "Value": [100.0, 200.0, 300.0],
@@ -212,7 +212,7 @@ class TestDateFormats:
         assert result.df.iloc[1]["Date"] == pd.Timestamp("2025-02-01")
 
     def test_spanish_month_full(self):
-        """'Enero 2025' → 2025-01-01."""
+        """'Enero 2025' â†’ 2025-01-01."""
         df = pd.DataFrame({
             "Date": ["Enero 2025", "Febrero 2025"],
             "Value": [100.0, 200.0],
@@ -222,7 +222,7 @@ class TestDateFormats:
         assert result.df.iloc[1]["Date"] == pd.Timestamp("2025-02-01")
 
     def test_quarterly_q1(self):
-        """'Q1 2025' → 2025-01-01."""
+        """'Q1 2025' â†’ 2025-01-01."""
         df = pd.DataFrame({
             "Date": ["Q1 2025", "Q2 2025", "Q3 2025", "Q4 2025"],
             "Value": [100.0, 200.0, 300.0, 400.0],
@@ -238,7 +238,7 @@ class TestDateFormats:
             assert result.df.iloc[i]["Date"] == exp
 
     def test_quarterly_year_q_format(self):
-        """'2025-Q1' → 2025-01-01."""
+        """'2025-Q1' â†’ 2025-01-01."""
         df = pd.DataFrame({
             "Date": ["2025-Q1", "2025-Q2"],
             "Value": [100.0, 200.0],
@@ -262,7 +262,7 @@ class TestDateFormats:
         assert info["confidence"] == "high"
 
     def test_iso_week(self):
-        """'2025-W03' → Monday of week 3 of 2025."""
+        """'2025-W03' â†’ Monday of week 3 of 2025."""
         df = pd.DataFrame({
             "Date": ["2025-W03", "2025-W04"],
             "Value": [100.0, 200.0],
@@ -271,8 +271,29 @@ class TestDateFormats:
         # Week 3 of 2025 starts on Monday 2025-01-13
         assert result.df.iloc[0]["Date"] == pd.Timestamp.fromisocalendar(2025, 3, 1)
 
+    def test_detect_date_format_campaign_year_span(self):
+        """detect_date_format identifies campaign year span format."""
+        s = pd.Series(["2025/2026", "2024-2025", "2023/24"])
+        info = detect_date_format(s)
+        assert info["format"] == "campaign_year_span"
+        assert info["frequency_hint"] == "A"
+
+    def test_campaign_year_span(self):
+        """Campaign strings map to the first year as YYYY-01-01."""
+        df = pd.DataFrame({
+            "Date": ["2025/2026", "2024-2025", "2023/24"],
+            "Value": [100.0, 200.0, 300.0],
+        })
+        result = canonicalize(df, date_col="Date", key_cols=[], value_col="Value")
+        parsed_dates = list(result.df["Date"])
+        assert parsed_dates == [
+            pd.Timestamp("2023-01-01"),
+            pd.Timestamp("2024-01-01"),
+            pd.Timestamp("2025-01-01"),
+        ]
+
     def test_year_only(self):
-        """'2025' → 2025-01-01."""
+        """'2025' â†’ 2025-01-01."""
         df = pd.DataFrame({
             "Date": ["2023", "2024", "2025"],
             "Value": [100.0, 200.0, 300.0],
@@ -282,9 +303,9 @@ class TestDateFormats:
         assert result.df.iloc[2]["Date"] == pd.Timestamp("2025-01-01")
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# New tests — number format detection & parsing
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# New tests â€” number format detection & parsing
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class TestNumberFormats:
     def _make_df(self, values):
@@ -292,33 +313,33 @@ class TestNumberFormats:
         return pd.DataFrame({"Date": dates, "Value": values})
 
     def test_european_number_format(self):
-        """'1.234,56' → 1234.56 via auto-detection."""
+        """'1.234,56' â†’ 1234.56 via auto-detection."""
         df = self._make_df(["1.234,56", "2.345,67"])
         result = canonicalize(df, date_col="Date", key_cols=[], value_col="Value")
         assert abs(result.df.iloc[0]["Value"] - 1234.56) < 0.01
         assert abs(result.df.iloc[1]["Value"] - 2345.67) < 0.01
 
     def test_currency_dollar(self):
-        """'$1,234.56' → 1234.56."""
+        """'$1,234.56' â†’ 1234.56."""
         df = self._make_df(["$1,234.56", "$2,345.67"])
         result = canonicalize(df, date_col="Date", key_cols=[], value_col="Value")
         assert abs(result.df.iloc[0]["Value"] - 1234.56) < 0.01
 
     def test_currency_euro(self):
-        """'€1.234,56' → 1234.56 (European format with euro sign)."""
+        """'€1.234,56' -> 1234.56 (European format with euro sign)."""
         df = self._make_df(["€1.234,56"])
         result = canonicalize(df, date_col="Date", key_cols=[], value_col="Value")
         assert abs(result.df.iloc[0]["Value"] - 1234.56) < 0.01
 
     def test_percentage_values(self):
-        """'15.5%' → 15.5 (strip % sign, do not divide)."""
+        """'15.5%' â†’ 15.5 (strip % sign, do not divide)."""
         df = self._make_df(["15.5%", "3.2%"])
         result = canonicalize(df, date_col="Date", key_cols=[], value_col="Value")
         assert abs(result.df.iloc[0]["Value"] - 15.5) < 0.01
         assert abs(result.df.iloc[1]["Value"] - 3.2) < 0.01
 
     def test_parentheses_negative(self):
-        """'(500)' → -500.0."""
+        """'(500)' â†’ -500.0."""
         df = self._make_df(["(500)", "(1200)"])
         result = canonicalize(df, date_col="Date", key_cols=[], value_col="Value")
         assert abs(result.df.iloc[0]["Value"] - (-500.0)) < 0.01
@@ -347,9 +368,9 @@ class TestNumberFormats:
         assert fmt["currency"] == "$"
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# New tests — null values
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# New tests â€” null values
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class TestNullValues:
     def _make_df(self, values):
@@ -359,25 +380,25 @@ class TestNullValues:
         })
 
     def test_custom_null_nd(self):
-        """'n/d' in value column → treated as NaN."""
+        """'n/d' in value column â†’ treated as NaN."""
         df = self._make_df(["100.0", "n/d", "200.0"])
         result = canonicalize(df, date_col="Date", key_cols=[], value_col="Value")
         assert result.df.iloc[1]["Value"] != result.df.iloc[1]["Value"]  # isnan
 
     def test_custom_null_dots(self):
-        """'...' → treated as NaN."""
+        """'...' â†’ treated as NaN."""
         df = self._make_df(["100.0", "...", "300.0"])
         result = canonicalize(df, date_col="Date", key_cols=[], value_col="Value")
         assert pd.isna(result.df.iloc[1]["Value"])
 
     def test_custom_null_dash(self):
-        """'-' (single dash) → treated as NaN."""
+        """'-' (single dash) â†’ treated as NaN."""
         df = self._make_df(["100.0", "-", "300.0"])
         result = canonicalize(df, date_col="Date", key_cols=[], value_col="Value")
         assert pd.isna(result.df.iloc[1]["Value"])
 
     def test_extra_custom_null(self):
-        """User-supplied null value 'missing' → treated as NaN."""
+        """User-supplied null value 'missing' â†’ treated as NaN."""
         df = self._make_df(["100.0", "missing", "300.0"])
         result = canonicalize(
             df, date_col="Date", key_cols=[], value_col="Value",
@@ -393,9 +414,9 @@ class TestNullValues:
         assert "#REF!" in CUSTOM_NULL_VALUES
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# New tests — scale
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# New tests â€” scale
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class TestScale:
     def test_scale_1000(self):
@@ -424,9 +445,9 @@ class TestScale:
         assert any("scale" in l.lower() for l in result.normalization_log)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# New tests — skip_rows_bottom
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# New tests â€” skip_rows_bottom
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class TestSkipRowsBottom:
     def test_skip_one_footer(self):
@@ -449,11 +470,11 @@ class TestSkipRowsBottom:
         assert len(result_no_skip.df) == len(result_skip0.df)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# New tests — Alphacast profile
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# New tests â€” Alphacast profile
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-class TestAlphacástProfile:
+class TestAlphacastProfile:
     def test_profile_has_required_keys(self):
         assert "header_row" in ALPHACAST_PROFILE
         assert "date_column_names" in ALPHACAST_PROFILE
@@ -515,59 +536,59 @@ class TestAlphacástProfile:
         assert isinstance(result["platform"]["number_format"], dict)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# New tests — compose_date_column
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# New tests â€” compose_date_column
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class TestComposeDateColumn:
     def _df(self, years, periods):
-        return pd.DataFrame({"Año": years, "Periodo": periods})
+        return pd.DataFrame({"AÃ±o": years, "Periodo": periods})
 
     def test_month_numeric_basic(self):
-        """year + numeric month → correct timestamps."""
+        """year + numeric month â†’ correct timestamps."""
         df = self._df([2024, 2024, 2024], [1, 6, 12])
-        result = compose_date_column(df, "Año", "Periodo", "month_numeric")
+        result = compose_date_column(df, "AÃ±o", "Periodo", "month_numeric")
         assert result.iloc[0] == pd.Timestamp("2024-01-01")
         assert result.iloc[1] == pd.Timestamp("2024-06-01")
         assert result.iloc[2] == pd.Timestamp("2024-12-01")
 
     def test_month_text_es(self):
-        """Spanish month names → correct timestamps."""
+        """Spanish month names â†’ correct timestamps."""
         df = self._df([2024, 2024, 2024], ["enero", "feb", "Marzo"])
-        result = compose_date_column(df, "Año", "Periodo", "month_text_es")
+        result = compose_date_column(df, "AÃ±o", "Periodo", "month_text_es")
         assert result.iloc[0] == pd.Timestamp("2024-01-01")
         assert result.iloc[1] == pd.Timestamp("2024-02-01")
         assert result.iloc[2] == pd.Timestamp("2024-03-01")
 
     def test_month_text_en(self):
-        """English month names → correct timestamps."""
+        """English month names â†’ correct timestamps."""
         df = self._df([2023, 2023], ["January", "Dec"])
-        result = compose_date_column(df, "Año", "Periodo", "month_text_en")
+        result = compose_date_column(df, "AÃ±o", "Periodo", "month_text_en")
         assert result.iloc[0] == pd.Timestamp("2023-01-01")
         assert result.iloc[1] == pd.Timestamp("2023-12-01")
 
     def test_quarter_numeric(self):
-        """Numeric quarters 1-4 → first month of each quarter."""
+        """Numeric quarters 1-4 â†’ first month of each quarter."""
         df = self._df([2025, 2025, 2025, 2025], [1, 2, 3, 4])
-        result = compose_date_column(df, "Año", "Periodo", "quarter_numeric")
+        result = compose_date_column(df, "AÃ±o", "Periodo", "quarter_numeric")
         assert result.iloc[0] == pd.Timestamp("2025-01-01")
         assert result.iloc[1] == pd.Timestamp("2025-04-01")
         assert result.iloc[2] == pd.Timestamp("2025-07-01")
         assert result.iloc[3] == pd.Timestamp("2025-10-01")
 
     def test_quarter_text_q(self):
-        """'Q1'/'Q2'/'Q3'/'Q4' → first month of each quarter."""
+        """'Q1'/'Q2'/'Q3'/'Q4' â†’ first month of each quarter."""
         df = self._df([2024, 2024, 2024, 2024], ["Q1", "Q2", "Q3", "Q4"])
-        result = compose_date_column(df, "Año", "Periodo", "quarter_text_q")
+        result = compose_date_column(df, "AÃ±o", "Periodo", "quarter_text_q")
         assert result.iloc[0] == pd.Timestamp("2024-01-01")
         assert result.iloc[1] == pd.Timestamp("2024-04-01")
         assert result.iloc[2] == pd.Timestamp("2024-07-01")
         assert result.iloc[3] == pd.Timestamp("2024-10-01")
 
     def test_quarter_text_t(self):
-        """'1T'/'2T'/'3T'/'4T' (Spanish format) → first month of each quarter."""
+        """'1T'/'2T'/'3T'/'4T' (Spanish format) â†’ first month of each quarter."""
         df = self._df([2023, 2023, 2023], ["1T", "2T", "4T"])
-        result = compose_date_column(df, "Año", "Periodo", "quarter_text_t")
+        result = compose_date_column(df, "AÃ±o", "Periodo", "quarter_text_t")
         assert result.iloc[0] == pd.Timestamp("2023-01-01")
         assert result.iloc[1] == pd.Timestamp("2023-04-01")
         assert result.iloc[2] == pd.Timestamp("2023-10-01")
@@ -575,21 +596,23 @@ class TestComposeDateColumn:
     def test_year_forward_fill(self):
         """NaN years are forward-filled (Excel merged-cell pattern)."""
         df = self._df([2024, None, None, 2025], [1, 2, 3, 1])
-        result = compose_date_column(df, "Año", "Periodo", "month_numeric")
+        result = compose_date_column(df, "AÃ±o", "Periodo", "month_numeric")
         assert result.iloc[0] == pd.Timestamp("2024-01-01")
         assert result.iloc[1] == pd.Timestamp("2024-02-01")  # ffill from 2024
         assert result.iloc[2] == pd.Timestamp("2024-03-01")  # ffill from 2024
         assert result.iloc[3] == pd.Timestamp("2025-01-01")
 
     def test_invalid_period_yields_nat(self):
-        """Unparseable period values → NaT (no crash)."""
+        """Unparseable period values â†’ NaT (no crash)."""
         df = self._df([2024, 2024], ["invalid_month", None])
-        result = compose_date_column(df, "Año", "Periodo", "month_text_es")
+        result = compose_date_column(df, "AÃ±o", "Periodo", "month_text_es")
         assert pd.isna(result.iloc[0])
         assert pd.isna(result.iloc[1])
 
     def test_unknown_period_type_all_nat(self):
-        """Unknown period_type → all NaT."""
+        """Unknown period_type â†’ all NaT."""
         df = self._df([2024, 2024], [1, 2])
-        result = compose_date_column(df, "Año", "Periodo", "unknown_type")
+        result = compose_date_column(df, "AÃ±o", "Periodo", "unknown_type")
         assert result.isna().all()
+
+

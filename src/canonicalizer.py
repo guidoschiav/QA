@@ -118,6 +118,7 @@ _DATE_PATTERNS: list[tuple[str, re.Pattern]] = [
     ("timestamp",           re.compile(r"^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}")),
     ("iso",                 re.compile(r"^\d{4}[-/]\d{2}[-/]\d{2}$")),
     ("iso_week",            re.compile(r"^\d{4}-W\d{2}$")),
+    ("campaign_year_span",  re.compile(r"^\d{4}(?:[/-])(?:\d{4}|\d{2})$")),
     ("year_only",           re.compile(r"^\d{4}$")),
     ("quarterly_q_year",    re.compile(r"^Q[1-4]\s?\d{4}$", re.I)),
     ("quarterly_year_q",    re.compile(r"^\d{4}[-_]Q[1-4]$", re.I)),
@@ -199,7 +200,7 @@ def detect_date_format(series: pd.Series, sample_size: int = 100) -> dict:
         frequency_hint = "Q"
     elif winner in (_MONTH_TEXT_ES | _MONTH_TEXT_EN | {"month_text_en_short", "month_text_es_short"}):
         frequency_hint = "M"
-    elif winner == "year_only":
+    elif winner in ("campaign_year_span", "year_only"):
         frequency_hint = "A"
     elif winner == "iso_week":
         frequency_hint = "W"
@@ -281,6 +282,31 @@ def _parse_month_text(series: pd.Series, lang: str = "es") -> pd.Series:
     return series.map(_parse_one)
 
 
+def _parse_campaign_year_span(series: pd.Series) -> pd.Series:
+    """Parse campaign strings like 2025/2026, 2025-2026, 2025/26 to YYYY-01-01."""
+    _re = re.compile(r"^(\d{4})(?:[/-])(\d{2}|\d{4})$")
+
+    def _parse_one(v):
+        s = str(v).strip()
+        m = _re.match(s)
+        if not m:
+            return pd.NaT
+        start_year = int(m.group(1))
+        end_part = m.group(2)
+        if len(end_part) == 2:
+            end_year = (start_year // 100) * 100 + int(end_part)
+        else:
+            end_year = int(end_part)
+        if end_year != start_year + 1:
+            return pd.NaT
+        try:
+            return pd.Timestamp(year=start_year, month=1, day=1)
+        except Exception:
+            return pd.NaT
+
+    return series.map(_parse_one)
+
+
 def _parse_iso_week(series: pd.Series) -> pd.Series:
     """Parse '2025-W03' to the Monday of that ISO week."""
     _re = re.compile(r"^(\d{4})-W(\d{2})$")
@@ -332,6 +358,10 @@ def _apply_date_parsing(
     if fmt_type in (_MONTH_TEXT_EN | {"month_text_en"}):
         return _parse_month_text(series, "en")
 
+    # Campaign year span
+    if fmt_type == "campaign_year_span":
+        return _parse_campaign_year_span(series)
+
     # Year only
     if fmt_type == "year_only":
         return pd.to_datetime(
@@ -348,7 +378,7 @@ def _apply_date_parsing(
 
     # Explicit strptime format string (not a special name)
     if explicit_fmt is not None and explicit_fmt not in (
-        "quarterly", "month_text_es", "month_text_en", "year_only", "iso_week",
+        "quarterly", "month_text_es", "month_text_en", "campaign_year_span", "year_only", "iso_week",
     ):
         return pd.to_datetime(series, format=explicit_fmt, errors="coerce")
 
@@ -545,7 +575,7 @@ def canonicalize(
             Use when df was loaded with header=None (junk rows at top).
         skip_rows_bottom: Number of rows to drop from the bottom (footers, totals).
         date_format: Explicit date format string (strptime) or special name:
-            'quarterly', 'month_text_es', 'month_text_en', 'year_only', 'iso_week'.
+            'quarterly', 'month_text_es', 'month_text_en', 'campaign_year_span', 'year_only', 'iso_week'.
             None = auto-detect.
         dayfirst: Override for DD/MM ambiguity. None = auto-detect.
         number_format: dict from detect_number_format(). None = auto-detect.
