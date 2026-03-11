@@ -1,4 +1,4 @@
-"""Auto-detect dataset structure and generate a config dict compatible with audit_dataset()."""
+﻿"""Auto-detect dataset structure and generate a config dict compatible with audit_dataset()."""
 from __future__ import annotations
 
 from typing import Any
@@ -46,7 +46,7 @@ def auto_detect_config(df: pd.DataFrame) -> dict:
             "field": "dimension_columns",
             "value": [],
             "confidence": "high",
-            "reason": "Wide format — dimension detection skipped",
+            "reason": "Wide format â€” dimension detection skipped",
         })
 
     freq, n = _detect_frequency(df, date_col)
@@ -91,7 +91,7 @@ def strip_internal_keys(config: dict) -> dict:
     return {k: v for k, v in config.items() if not k.startswith("_")}
 
 
-# ── Detection helpers ──────────────────────────────────────────────────────────
+# â”€â”€ Detection helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def _parse_last_date(series: pd.Series) -> pd.Timestamp | None:
     """
@@ -99,9 +99,9 @@ def _parse_last_date(series: pd.Series) -> pd.Timestamp | None:
     Returns None if no valid date after 2000-01-01 can be found.
 
     Strategies tried (in order):
-    1. Direct pd.to_datetime() — handles most string formats (YYYY-MM-DD, etc.)
-    2. Format '%Y%m%d' as string — handles YYYYMMDD integers/strings (e.g. 20260115)
-    3. pd.to_datetime() with dayfirst=True — handles DD/MM/YYYY
+    1. Direct pd.to_datetime() â€” handles most string formats (YYYY-MM-DD, etc.)
+    2. Format '%Y%m%d' as string â€” handles YYYYMMDD integers/strings (e.g. 20260115)
+    3. pd.to_datetime() with dayfirst=True â€” handles DD/MM/YYYY
     """
     _MIN_VALID = pd.Timestamp("2000-01-01")
 
@@ -204,7 +204,7 @@ def _detect_date_column(df: pd.DataFrame) -> tuple[str | None, list[dict]]:
         "field": "date_column",
         "value": None,
         "confidence": "low",
-        "reason": "no date column found — check column names",
+        "reason": "no date column found â€” check column names",
     })
     return None, notes
 
@@ -238,7 +238,7 @@ def _detect_format(
             "field": "format",
             "value": "long",
             "confidence": "low",
-            "reason": "no numeric columns found — defaulting to long",
+            "reason": "no numeric columns found â€” defaulting to long",
         })
         return "long", None, [], notes
 
@@ -258,7 +258,7 @@ def _detect_format(
         })
         return "long", vc, [], notes
 
-    # 2+ numeric columns → wide
+    # 2+ numeric columns â†’ wide
     notes.append({
         "field": "format",
         "value": "wide",
@@ -298,7 +298,7 @@ def _detect_dimensions(
                 "field": "dimension_columns",
                 "value": col,
                 "confidence": "low",
-                "reason": f"'{col}' excluded — {n_unique} unique values (likely free text)",
+                "reason": f"'{col}' excluded â€” {n_unique} unique values (likely free text)",
             })
         else:
             dim_cols.append(col)
@@ -326,7 +326,7 @@ def _detect_frequency(
             "field": "expected_frequency",
             "value": "D",
             "confidence": "low",
-            "reason": "no date column — defaulting to daily",
+            "reason": "no date column â€” defaulting to daily",
         })
         return "D", notes
 
@@ -348,7 +348,7 @@ def _detect_frequency(
             "field": "expected_frequency",
             "value": "D",
             "confidence": "low",
-            "reason": "irregular intervals — defaulting to daily",
+            "reason": "irregular intervals â€” defaulting to daily",
         })
         return "D", notes
 
@@ -379,17 +379,17 @@ def _compute_smart_defaults(
 
     vc_list = [value_col] if (fmt == "long" and value_col) else value_cols
 
-    # ── max_null_pct ──────────────────────────────────────────────────────────
+    # â”€â”€ max_null_pct â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     null_rate = float(df.isnull().values.mean())
     if null_rate < 0.01:
         result["max_null_pct"] = 0.02
-        null_reason = f"actual null rate < 1% — threshold set to 2%"
+        null_reason = f"actual null rate < 1% â€” threshold set to 2%"
     elif null_rate <= 0.05:
         result["max_null_pct"] = round(null_rate + 0.02, 3)
-        null_reason = f"actual null rate {null_rate:.1%} — threshold set to {result['max_null_pct']:.1%}"
+        null_reason = f"actual null rate {null_rate:.1%} â€” threshold set to {result['max_null_pct']:.1%}"
     else:
         result["max_null_pct"] = 0.10
-        null_reason = f"high null rate {null_rate:.1%} — threshold set to 10% (review source data)"
+        null_reason = f"high null rate {null_rate:.1%} â€” threshold set to 10% (review source data)"
 
     notes.append({
         "field": "max_null_pct",
@@ -398,7 +398,7 @@ def _compute_smart_defaults(
         "reason": null_reason,
     })
 
-    # ── allow_zero_values ─────────────────────────────────────────────────────
+    # â”€â”€ allow_zero_values â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     zero_pct = 0.0
     for vc in vc_list:
         if vc in df.columns:
@@ -409,10 +409,10 @@ def _compute_smart_defaults(
 
     if zero_pct >= 0.05:
         result["allow_zero_values"] = True
-        zero_reason = f"zeros are {zero_pct:.1%} of values — appear intentional"
+        zero_reason = f"zeros are {zero_pct:.1%} of values â€” appear intentional"
     elif zero_pct > 0:
         result["allow_zero_values"] = False
-        zero_reason = f"zeros are {zero_pct:.1%} of values — flagged as suspicious"
+        zero_reason = f"zeros are {zero_pct:.1%} of values â€” flagged as suspicious"
     else:
         result["allow_zero_values"] = True
         zero_reason = "no zeros found in value column(s)"
@@ -424,7 +424,7 @@ def _compute_smart_defaults(
         "reason": zero_reason,
     })
 
-    # ── acceptable_lag_days ───────────────────────────────────────────────────
+    # â”€â”€ acceptable_lag_days â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if date_col and date_col in df.columns:
         last_date = _parse_last_date(df[date_col])
         today = pd.Timestamp.today().normalize()
@@ -432,9 +432,6 @@ def _compute_smart_defaults(
             actual_lag = int((today - last_date.normalize()).days)
         else:
             actual_lag = None
-
-        # Debug print — remove after confirming fix
-        print(f"[auto_detect] fecha_maxima={last_date}, hoy={today.date()}, lag={actual_lag} dias")
 
         if actual_lag is not None and 0 <= actual_lag <= 3650:
             result["acceptable_lag_days"] = 2 if actual_lag <= 3 else actual_lag + 1
@@ -451,15 +448,15 @@ def _compute_smart_defaults(
                 "value": 3,
                 "confidence": "low",
                 "reason": (
-                    f"no se pudo parsear la fecha correctamente (resultado: {last_date}) — default 3 dias"
+                    f"no se pudo parsear la fecha correctamente (resultado: {last_date}) â€” default 3 dias"
                     if last_date is None or actual_lag is None
-                    else f"lag irrazonable ({actual_lag} dias) — verifique formato de fechas — default 3 dias"
+                    else f"lag irrazonable ({actual_lag} dias) â€” verifique formato de fechas â€” default 3 dias"
                 ),
             })
     else:
         result["acceptable_lag_days"] = 3
 
-    # ── value_range ───────────────────────────────────────────────────────────
+    # â”€â”€ value_range â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     vmin_all: float | None = None
     vmax_all: float | None = None
     for vc in vc_list:
@@ -486,7 +483,7 @@ def _compute_smart_defaults(
     else:
         result["value_range"] = {"min": None, "max": None}
 
-    # ── expected_dimensions ───────────────────────────────────────────────────
+    # â”€â”€ expected_dimensions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     exp_dims: dict[str, list | None] = {}
     for col in dim_cols:
         if col in df.columns:
@@ -494,7 +491,7 @@ def _compute_smart_defaults(
             exp_dims[col] = unique_vals if len(unique_vals) <= 50 else None
     result["expected_dimensions"] = exp_dims
 
-    # ── expected_start ────────────────────────────────────────────────────────
+    # â”€â”€ expected_start â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if date_col and date_col in df.columns:
         first = pd.to_datetime(df[date_col], errors="coerce").dropna().min()
         result["expected_start"] = first.strftime("%Y-%m-%d")
@@ -502,3 +499,5 @@ def _compute_smart_defaults(
         result["expected_start"] = None
 
     return result, notes
+
+
