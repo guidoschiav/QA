@@ -34,7 +34,7 @@ from src.config_loader import config_from_dict
 from src.report import export_report_json
 from src.snapshot_manager import load_snapshot, save_snapshot
 from src.series_extractor import (
-    extract_series_wide, extract_series_long,
+    extract_series_wide, extract_series_long, extract_series_long_multi,
     extract_series_wide_transposed, extract_series_auto_platform,
     ExtractionResult, Series,
 )
@@ -838,6 +838,7 @@ with tab_compare:
                         st.session_state["source_df"] = _df_new
                         st.session_state["_src_file_key"] = _sk
                         st.session_state["_src_filename"] = src_file.name
+                        st.rerun()
 
             _src_df_cur = st.session_state.get("source_df")
             if _src_df_cur is not None:
@@ -911,6 +912,7 @@ with tab_compare:
                             st.session_state["_plat_file_key"] = _pk
                             st.session_state.pop("alphacast_dataset_id", None)
                             st.session_state.pop("alphacast_dataset_name", None)
+                            st.rerun()
 
             else:
                 # ── Alphacast API panel ───────────────────────────────────────
@@ -1131,7 +1133,7 @@ with tab_compare:
                         st.error("Debe haber al menos 1 columna de tipo Valor.")
                         _can_confirm = False
                     elif _n_val > 1:
-                        st.warning("Más de 1 columna Valor — se usará la primera.")
+                        st.info("Se detectaron múltiples columnas Valor: se tratarán como métricas separadas.")
                 elif _src_fmt == "wide":
                     _n_serie = (_edited_cls["Tu clasificación"] == "Serie").sum()
                     if _n_serie == 0:
@@ -1288,13 +1290,11 @@ with tab_compare:
                         _src_df_ex, _cls_ex, st.session_state.get("source_period_type")
                     )
                     _dim_cols_ex = [c for c, t in _cls_ex.items() if t == "Dimensión"]
-                    _val_col_ex = next(
-                        (c for c, t in _cls_ex.items() if t == "Valor"), None
-                    )
-                    if not _date_col_ex or not _val_col_ex:
+                    _val_cols_ex = [c for c, t in _cls_ex.items() if t == "Valor"]
+                    if not _date_col_ex or not _val_cols_ex:
                         st.error("Clasificación Source incompleta: falta columna Fecha o Valor.")
                     else:
-                        _src_ext = extract_series_long(_src_df_composed, _date_col_ex, _dim_cols_ex, _val_col_ex)
+                        _src_ext = extract_series_long_multi(_src_df_composed, _date_col_ex, _dim_cols_ex, _val_cols_ex)
 
                 elif _fmt_ex == "wide":
                     _src_df_composed, _date_col_ex = _apply_date_composition(
@@ -1323,14 +1323,12 @@ with tab_compare:
                         _plat_ext = extract_series_wide(_plat_df_composed, _plat_date_col_ex, _plat_val_cols_ex)
                 else:  # long
                     _plat_dim_cols_ex = [c for c, t in _plat_cls_ex.items() if t == "Dimensión"]
-                    _plat_val_col_ex = next(
-                        (c for c, t in _plat_cls_ex.items() if t == "Valor"), None
-                    )
-                    if not _plat_date_col_ex or not _plat_val_col_ex:
+                    _plat_val_cols_ex = [c for c, t in _plat_cls_ex.items() if t == "Valor"]
+                    if not _plat_date_col_ex or not _plat_val_cols_ex:
                         st.error("Clasificación Platform incompleta: falta Fecha o columna Valor.")
                     else:
-                        _plat_ext = extract_series_long(
-                            _plat_df_composed, _plat_date_col_ex, _plat_dim_cols_ex, _plat_val_col_ex
+                        _plat_ext = extract_series_long_multi(
+                            _plat_df_composed, _plat_date_col_ex, _plat_dim_cols_ex, _plat_val_cols_ex
                         )
 
                 if _src_ext is not None and _plat_ext is not None:

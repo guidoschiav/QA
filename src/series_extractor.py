@@ -258,6 +258,52 @@ def extract_series_wide(
     )
 
 
+def extract_series_long_multi(
+    df: pd.DataFrame,
+    date_col: str,
+    dimension_cols: list[str],
+    value_cols: list[str],
+    metric_col_name: str = "Métrica",
+) -> ExtractionResult:
+    """
+    Extract series from a long-format DataFrame with one or more value columns.
+    If multiple value columns are provided, they are melted into a canonical
+    long format using an extra metric dimension.
+    """
+    effective_value_cols = [c for c in value_cols if c in df.columns]
+    if not effective_value_cols:
+        return ExtractionResult(
+            series=[], total_series=0, dataset_format="long",
+            date_column=date_col, dimension_columns=dimension_cols,
+            value_columns=[], ignored_columns=[],
+            extraction_log=["No valid value columns found for long extraction."],
+        )
+
+    if len(effective_value_cols) == 1:
+        return extract_series_long(df, date_col, dimension_cols, effective_value_cols[0])
+
+    work = df.copy()
+    id_vars = [date_col] + [c for c in dimension_cols if c in work.columns]
+    melted = work.melt(
+        id_vars=id_vars,
+        value_vars=effective_value_cols,
+        var_name=metric_col_name,
+        value_name="_value_multi",
+    )
+    result = extract_series_long(
+        melted,
+        date_col,
+        id_vars[1:] + [metric_col_name],
+        "_value_multi",
+    )
+    result.value_columns = effective_value_cols
+    result.dimension_columns = id_vars[1:] + [metric_col_name]
+    result.extraction_log = [
+        f"Melted {len(effective_value_cols)} value columns into metric column '{metric_col_name}'."
+    ] + result.extraction_log
+    return result
+
+
 def extract_series_long(
     df: pd.DataFrame,
     date_col: str,

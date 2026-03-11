@@ -12,6 +12,7 @@ from src.series_extractor import (
     ExtractionResult,
     Series,
     extract_series_long,
+    extract_series_long_multi,
     extract_series_wide,
     extract_series_wide_transposed,
     extract_series_auto_platform,
@@ -37,6 +38,16 @@ def _make_long_df():
         "Date": list(dates) * 2,
         "Country": ["Argentina"] * n + ["Brazil"] * n,
         "Value": list(range(10, 10 + n)) + list(range(20, 20 + n)),
+    })
+
+
+def _make_long_multi_df():
+    dates = pd.date_range("2023-01-01", periods=3, freq="YS").strftime("%Y-%m-%d")
+    return pd.DataFrame({
+        "Date": list(dates) * 2,
+        "Country": ["Argentina"] * 3 + ["Brazil"] * 3,
+        "Sembrado": [10, 11, 12, 20, 21, 22],
+        "Producción": [100, 101, 102, 200, 201, 202],
     })
 
 
@@ -297,3 +308,27 @@ class TestExtractSeriesAutoPlatform:
         df = _make_long_df()
         result = extract_series_auto_platform(df)
         assert len(result.extraction_log) > 0
+
+
+class TestExtractSeriesLongMulti:
+    def test_multiple_value_columns_become_separate_metric_series(self):
+        df = _make_long_multi_df()
+        result = extract_series_long_multi(df, "Date", ["Country"], ["Sembrado", "Producción"])
+        assert result.total_series == 4
+        names = {s.name for s in result.series}
+        assert "Argentina | Sembrado" in names
+        assert "Argentina | Producción" in names
+        assert "Brazil | Sembrado" in names
+        assert "Brazil | Producción" in names
+
+    def test_value_columns_preserved_in_metadata(self):
+        df = _make_long_multi_df()
+        result = extract_series_long_multi(df, "Date", ["Country"], ["Sembrado", "Producción"])
+        assert result.value_columns == ["Sembrado", "Producción"]
+        assert "Métrica" in result.dimension_columns
+
+    def test_single_value_column_falls_back_to_regular_long(self):
+        df = _make_long_multi_df()
+        result = extract_series_long_multi(df, "Date", ["Country"], ["Sembrado"])
+        assert result.total_series == 2
+        assert {s.name for s in result.series} == {"Argentina", "Brazil"}
